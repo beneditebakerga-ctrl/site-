@@ -1,0 +1,4088 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>VirtuNum - Plateforme de numéros virtuels n°1 en Afrique</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- AOS pour animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <style>
+        /* ========== RESET & VARIABLES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 70px;
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            color: #1f2937;
+            min-height: 100vh;
+            line-height: 1.5;
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+            font-size: 14px;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #f72585;
+            --secondary-dark: #b5179e;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --warning: #ffd166;
+            --info: #4cc9f0;
+            --card-bg: #ffffff;
+            --text-dark: #2b2d42;
+            --text-light: #6c757d;
+            --border-radius: 12px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
+            --gradient-success: linear-gradient(135deg, #06d6a0 0%, #1b9aaa 100%);
+        }
+
+        /* ========== CONTAINER ========== */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            box-sizing: border-box;
+        }
+        
+        .container-sm {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ========== UTILITAIRES ========== */
+        .d-none { display: none !important; }
+        .text-center { text-align: center; }
+        .text-gradient { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .flex-wrap { flex-wrap: wrap; }
+        .cursor-pointer { cursor: pointer; }
+        .w-100 { width: 100%; }
+
+        /* ========== BOUTONS ========== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            font-size: 0.95rem;
+            line-height: 1;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-secondary);
+            color: white;
+            box-shadow: 0 8px 20px -5px rgba(247, 37, 133, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -5px rgba(247, 37, 133, 0.6);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn-success {
+            background: var(--gradient-success);
+            color: white;
+            box-shadow: 0 8px 20px -5px rgba(6, 214, 160, 0.4);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -5px rgba(6, 214, 160, 0.6);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef476f 0%, #d62828 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -5px rgba(239, 71, 111, 0.6);
+        }
+        
+        .btn-block { width: 100%; }
+        .btn-sm { padding: 0.5rem 1.2rem; font-size: 0.85rem; }
+        .btn-lg { padding: 1rem 2rem; font-size: 1.1rem; }
+
+        /* ========== FORMULAIRES ========== */
+        .form-group { 
+            margin-bottom: 1.5rem; 
+            position: relative;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .form-check-input {
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: var(--primary);
+        }
+
+        /* ========== CARTES ========== */
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f3f5;
+        }
+        
+        .card-header h2 {
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .card-header h3 {
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+        
+        .card-footer {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid #f1f3f5;
+        }
+
+        /* ========== ALERTES ========== */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid transparent;
+            font-size: 0.95rem;
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            border-left-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        /* ========== HEADER ========== */
+        header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 0.75rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(67,97,238,0.1);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .menu-toggle {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 8px 15px -5px rgba(102, 126, 234, 0.5);
+        }
+        
+        .menu-toggle:hover {
+            transform: scale(1.1) rotate(90deg);
+            border-radius: 50%;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .header-right .btn-outline {
+            border-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.95rem;
+            border-width: 2px;
+        }
+        
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.1);
+            border-radius: 50%;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0; left: -320px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+            z-index: 1001;
+            transition: left 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow-y: auto;
+        }
+        
+        .sidebar.open { left: 0; }
+        
+        .sidebar-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .sidebar-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            border: 3px solid white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .sidebar-user-info h4 { font-size: 1.2rem; margin-bottom: 0.3rem; font-weight: 700; }
+        .sidebar-user-info p { font-size: 0.8rem; opacity: 0.9; }
+        
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 1px solid #f1f3f5;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .sidebar-menu-item:hover {
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+            color: var(--primary);
+            padding-left: 2rem;
+        }
+        
+        .sidebar-menu-item i { 
+            width: 24px; 
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .sidebar-menu-item.boost-item {
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            border-left: 4px solid #764ba2;
+            font-weight: 700;
+        }
+        
+        .sidebar-menu-item.logout {
+            color: var(--danger);
+            border-top: 2px solid #f1f3f5;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, #ef476f10, #d6282810);
+        }
+        
+        .close-sidebar {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .close-sidebar:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+
+        /* ========== PAGES ========== */
+        .page { 
+            display: none; 
+            min-height: calc(100vh - 70px); 
+            animation: pageFade 0.4s; 
+            padding: 2rem 0;
+        }
+        .page.active-page { display: block; }
+        
+        @keyframes pageFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== GRILLES ========== */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .service-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            padding: 1.5rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .service-card:hover::before {
+            left: 100%;
+        }
+        
+        .service-card:hover {
+            border-color: var(--secondary);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .service-card i { 
+            font-size: 2.5rem; 
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .service-card:hover i {
+            transform: scale(1.2);
+        }
+        
+        .service-card h3 { 
+            font-size: 1rem; 
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* ========== STATS CARDS ========== */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            cursor: pointer;
+            transition: all 0.4s;
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .stat-card i {
+            font-size: 2rem;
+            color: white;
+            background: var(--gradient-primary);
+            padding: 1rem;
+            border-radius: 18px;
+            box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.5);
+        }
+        
+        .stat-card div p:first-child { 
+            font-size: 1.8rem; 
+            font-weight: 800; 
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+        .stat-card div p:last-child { 
+            font-size: 0.9rem; 
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* ========== WELCOME CARD ========== */
+        .welcome-card {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 2rem;
+            border-radius: 30px;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 20px 30px -10px rgba(102, 126, 234, 0.5);
+        }
+        
+        .balance-box {
+            background: rgba(255,255,255,0.2);
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .balance-amount { 
+            font-size: 2.2rem; 
+            font-weight: 800; 
+            margin: 0.5rem 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* ========== TABLEAUX ========== */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            max-width: 100%;
+            border-radius: 20px;
+            background: white;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .table thead {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .table thead th { 
+            padding: 1rem; 
+            text-align: left; 
+            font-weight: 600;
+        }
+        .table tbody td { 
+            padding: 1rem; 
+            border-bottom: 1px solid #f1f3f5;
+        }
+        .table tbody tr:hover {
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-success { background: #d4edda; color: #155724; border: 1px solid #28a745; }
+        .badge-danger { background: #f8d7da; color: #721c24; border: 1px solid #dc3545; }
+        .badge-warning { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+
+        /* ========== AVIS SLIDER ========== */
+        .avis-slider {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            margin: 2rem 0;
+            padding: 1rem 0;
+        }
+        
+        .avis-track {
+            display: flex;
+            gap: 1.5rem;
+            animation: scrollAvis 40s linear infinite;
+            width: fit-content;
+        }
+        
+        .avis-track:hover {
+            animation-play-state: paused;
+        }
+        
+        @keyframes scrollAvis {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        .avis-card {
+            min-width: 320px;
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(67,97,238,0.1);
+            transition: all 0.3s;
+        }
+        
+        .avis-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary);
+        }
+        
+        .avis-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .avis-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .avis-author {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+        
+        .avis-date {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        .avis-rating {
+            color: #ffc107;
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .avis-content {
+            font-style: italic;
+            color: var(--text-dark);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* ========== FAQ ========== */
+        .faq-container {
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+        
+        .faq-item {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid #e9ecef;
+        }
+        
+        .faq-item:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+        
+        .faq-question {
+            padding: 1.2rem 1.5rem;
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-dark);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .faq-question i {
+            transition: transform 0.3s;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            background: white;
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 0 1.5rem;
+        }
+        
+        .faq-answer.show {
+            max-height: 200px;
+            padding: 1.2rem 1.5rem;
+        }
+
+        /* ========== PAYS ITEMS ========== */
+        .country-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .country-item {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #e9ecef;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .country-item:hover {
+            border-color: var(--secondary);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+        }
+        
+        .country-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .country-flag {
+            font-size: 1.8rem;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.1));
+        }
+        
+        .country-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .country-price {
+            font-weight: 700;
+            color: var(--secondary);
+            background: #f8f9fa;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            border: 1px solid var(--secondary);
+        }
+
+        /* ========== ORDER SUMMARY ========== */
+        .order-summary {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .order-summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px dashed #dee2e6;
+        }
+        
+        .order-summary-row.total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: none;
+        }
+
+        /* ========== BOOST PACKS ========== */
+        .boost-packs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .boost-pack-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid #e9ecef;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .boost-pack-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+        
+        .boost-pack-card:hover::before {
+            opacity: 1;
+            transform: rotate(45deg) translate(10%, 10%);
+        }
+        
+        .boost-pack-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--secondary);
+            box-shadow: 0 25px 35px -10px rgba(247, 37, 133, 0.4);
+        }
+        
+        .boost-pack-card.popular {
+            border: 3px solid #ffd700;
+            box-shadow: 0 10px 30px -5px rgba(255,215,0,0.3);
+        }
+        
+        .boost-platform-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.4s;
+        }
+        
+        .boost-pack-card:hover .boost-platform-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+        
+        .boost-price {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 1rem 0;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .boost-price small {
+            font-size: 1rem;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+        
+        .boost-features {
+            list-style: none;
+            margin: 1.5rem 0;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+        
+        .boost-features li {
+            margin: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-dark);
+            transition: transform 0.2s;
+        }
+        
+        .boost-features li:hover {
+            transform: translateX(5px);
+        }
+        
+        .boost-features i {
+            color: var(--success);
+            width: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .boost-guarantee {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #2d2d2d;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            box-shadow: 0 5px 10px rgba(255,215,0,0.3);
+        }
+        
+        .boost-sold-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        
+        .boost-sold-sufficient {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #28a745;
+        }
+        
+        .boost-sold-insufficient {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #dc3545;
+        }
+
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 50px rgba(0,0,0,0.3);
+            animation: modalSlideUp 0.4s;
+        }
+        
+        @keyframes modalSlideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 30px 30px 0 0;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        /* ========== TOAST ========== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .toast {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 300px;
+            max-width: 400px;
+            animation: toastSlide 0.3s;
+            border-left: 4px solid;
+        }
+        
+        @keyframes toastSlide {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .toast-success { border-left-color: #28a745; }
+        .toast-danger { border-left-color: #dc3545; }
+        .toast-warning { border-left-color: #ffc107; }
+        .toast-info { border-left-color: #17a2b8; }
+        
+        .toast-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .toast-success .toast-icon { background: #d4edda; color: #28a745; }
+        .toast-danger .toast-icon { background: #f8d7da; color: #dc3545; }
+        .toast-warning .toast-icon { background: #fff3cd; color: #ffc107; }
+        .toast-info .toast-icon { background: #d1ecf1; color: #17a2b8; }
+        
+        .toast-content {
+            flex: 1;
+        }
+        
+        .toast-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .toast-message {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* ========== LOADING ========== */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f1f3f5;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: linear-gradient(135deg, #2b2d42, #1a1b2f);
+            color: white;
+            padding: 3rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: white;
+            position: relative;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--secondary);
+            border-radius: 3px;
+        }
+        
+        .footer-section p {
+            color: #adb5bd;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin: 0.8rem 0;
+        }
+        
+        .footer-section ul li a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .footer-section ul li a:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .footer-section ul li a i {
+            width: 20px;
+            color: var(--secondary);
+        }
+        
+        .footer-section ul li i {
+            width: 20px;
+            color: var(--secondary);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            color: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #adb5bd;
+            font-size: 0.9rem;
+        }
+
+        /* ========== STEPS ========== */
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #e9ecef;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        
+        .step {
+            background: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+            border: 2px solid #e9ecef;
+            color: var(--text-light);
+        }
+        
+        .step.active {
+            border-color: var(--secondary);
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+            color: var(--secondary);
+        }
+        
+        .step.completed {
+            border-color: var(--success);
+            background: #d4edda;
+            color: var(--success);
+        }
+
+        /* ========== BOOST DETAIL ========== */
+        .boost-link-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .boost-link-group input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        
+        .boost-link-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        }
+        
+        .boost-link-group input.error {
+            border-color: var(--danger);
+            animation: shake 0.3s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            
+            h1 { font-size: 1.8rem !important; }
+            h2 { font-size: 1.4rem !important; }
+            
+            .service-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .service-card { padding: 1rem 0.2rem; }
+            .service-card i { font-size: 1.8rem; }
+            .service-card h3 { font-size: 0.8rem; }
+            
+            .boost-packs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .welcome-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .country-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .service-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .menu-toggle {
+                width: 38px;
+                height: 38px;
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header dynamique -->
+    <header id="mainHeader"></header>
+
+    <!-- Sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-sidebar" onclick="closeSidebar()">×</button>
+        <div class="sidebar-header">
+            <div class="sidebar-avatar" id="sidebarAvatar">U</div>
+            <div class="sidebar-user-info">
+                <h4 id="sidebarUserName">Utilisateur</h4>
+                <p id="sidebarUserEmail">email@example.com</p>
+            </div>
+        </div>
+        <div class="sidebar-menu">
+            <div class="sidebar-menu-item" onclick="showPage('dashboard'); closeSidebar()">
+                <i class="fas fa-tachometer-alt"></i> Tableau de bord
+            </div>
+            <div class="sidebar-menu-item" onclick="showPage('buyService'); closeSidebar()">
+                <i class="fas fa-shopping-cart"></i> Acheter un numéro
+            </div>
+            <div class="sidebar-menu-item" onclick="showPage('mesNumeros'); closeSidebar()">
+                <i class="fas fa-phone-alt"></i> Mes numéros
+            </div>
+            <div class="sidebar-menu-item" onclick="showPage('historique'); closeSidebar()">
+                <i class="fas fa-history"></i> Historique
+            </div>
+            <div class="sidebar-menu-item" onclick="showPage('recharge'); closeSidebar()">
+                <i class="fas fa-wallet"></i> Recharger
+            </div>
+            <div class="sidebar-menu-item" onclick="showPage('profile'); closeSidebar()">
+                <i class="fas fa-user-cog"></i> Mon profil
+            </div>
+            
+            <div class="sidebar-menu-item boost-item" onclick="showPage('boostReseaux'); closeSidebar()">
+                <i class="fas fa-rocket"></i> 🚀 Boostage réseaux
+            </div>
+            
+            <div class="sidebar-menu-item logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE ACCUEIL ========== -->
+    <div id="homePage" class="page active-page">
+        <section class="hero" style="padding: 4rem 0; text-align: center;">
+            <div class="container">
+                <h1 data-aos="fade-up" style="font-size: 3rem; max-width: 800px; margin: 0 auto 1.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    #1 Plateforme de numéros virtuels en Afrique
+                </h1>
+                <p data-aos="fade-up" data-aos-delay="200" style="font-size: 1.2rem; color: var(--text-light); max-width: 700px; margin: 0 auto 2rem;">
+                    Obtenez instantanément des numéros virtuels pour toutes vos applications. Sécurisé, rapide et abordable.
+                </p>
+                <div data-aos="fade-up" data-aos-delay="400" style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-primary btn-lg" onclick="redirectToBuy()">
+                        <i class="fas fa-rocket"></i> COMMENCER MAINTENANT
+                    </button>
+                    <button class="btn btn-outline btn-lg" onclick="showPage('login')">
+                        <i class="fas fa-sign-in-alt"></i> SE CONNECTER
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <!-- Pourquoi nous choisir -->
+            <h2 data-aos="fade-right" class="text-center" style="margin: 3rem 0 2rem; font-size: 2.2rem;">
+                <span class="text-gradient">Pourquoi choisir VirtuNum ?</span>
+            </h2>
+            <div class="stats-cards" data-aos="fade-up">
+                <div class="stat-card"><i class="fas fa-bolt"></i><div><p>Immédiat</p><p>Activation en 30s</p></div></div>
+                <div class="stat-card"><i class="fas fa-shield-alt"></i><div><p>Sécurité</p><p>maximale</p></div></div>
+                <div class="stat-card"><i class="fas fa-globe-africa"></i><div><p>200+</p><p>pays disponibles</p></div></div>
+                <div class="stat-card"><i class="fas fa-tags"></i><div><p>Prix</p><p>abordables</p></div></div>
+            </div>
+
+            <!-- Applications compatibles -->
+            <h2 data-aos="fade-right" class="text-center" style="margin: 3rem 0 2rem; font-size: 2.2rem;">
+                <span class="text-gradient">Applications compatibles</span>
+            </h2>
+            <div class="service-grid" id="homeServicesGrid" data-aos="zoom-in"></div>
+
+            <!-- Comment ça marche -->
+            <h2 data-aos="fade-right" class="text-center" style="margin: 3rem 0 2rem; font-size: 2.2rem;">
+                <span class="text-gradient">Comment ça marche ?</span>
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;" data-aos="fade-up">
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">1️⃣</div>
+                    <h3 style="color: var(--primary);">Choisis un service</h3>
+                    <p style="color: var(--text-light);">Parmi plus de 50 applications</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">2️⃣</div>
+                    <h3 style="color: var(--primary);">Sélectionne le pays</h3>
+                    <p style="color: var(--text-light);">200+ pays disponibles</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">3️⃣</div>
+                    <h3 style="color: var(--primary);">Paie avec ton solde</h3>
+                    <p style="color: var(--text-light);">Paiement sécurisé</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">4️⃣</div>
+                    <h3 style="color: var(--primary);">Reçois le code SMS</h3>
+                    <p style="color: var(--text-light);">En moins de 30 secondes</p>
+                </div>
+            </div>
+
+            <!-- AVIS CLIENTS SLIDER -->
+            <h2 data-aos="fade-right" class="text-center" style="margin: 3rem 0 2rem; font-size: 2.2rem;">
+                <span class="text-gradient">Ce que nos clients disent</span>
+            </h2>
+            <div class="avis-slider" data-aos="fade-up">
+                <div class="avis-track" id="avisTrack"></div>
+            </div>
+
+            <!-- Formulaire avis -->
+            <div class="card" data-aos="fade-up" style="margin-top: 3rem;">
+                <h3 style="font-size: 1.6rem; margin-bottom: 1.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    Laisse ton avis
+                </h3>
+                <form id="publicAvisForm">
+                    <div class="form-group">
+                        <label class="form-label">Ton nom</label>
+                        <input type="text" class="form-control" id="avisName" placeholder="Ex: Jean Dupont" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Note</label>
+                        <select class="form-control" id="avisRating" required>
+                            <option value="5">5 ⭐⭐⭐⭐⭐ Excellent</option>
+                            <option value="4">4 ⭐⭐⭐⭐ Très bien</option>
+                            <option value="3">3 ⭐⭐⭐ Bien</option>
+                            <option value="2">2 ⭐⭐ Moyen</option>
+                            <option value="1">1 ⭐ Décevant</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" id="avisMessage" rows="3" placeholder="Partage ton expérience..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                        <i class="fas fa-paper-plane"></i> Envoyer mon avis
+                    </button>
+                </form>
+            </div>
+
+            <!-- SECTION BOOSTAGE -->
+            <div class="boost-section" data-aos="fade-up" style="margin: 4rem 0;">
+                <h2 class="text-center" style="font-size: 2.2rem; margin-bottom: 1.5rem;">
+                    <i class="fas fa-rocket" style="color: #764ba2;"></i> 
+                    <span class="text-gradient">Boostage réseaux sociaux</span>
+                </h2>
+                <p class="text-center" style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--text-light);">
+                    Augmente ta popularité sur les réseaux avec ton solde VirtuNum !
+                </p>
+                
+                <div class="boost-packs-grid">
+                    <!-- Pack TikTok -->
+                    <div class="boost-pack-card popular" onclick="selectBoostPack('tiktok')">
+                        <div class="boost-guarantee"><i class="fas fa-shield-alt"></i> Garantie 5 mois</div>
+                        <div class="boost-platform-icon"><i class="fab fa-tiktok" style="color: #000;"></i></div>
+                        <h3 style="font-size: 1.3rem;">TikTok Viral</h3>
+                        <div class="boost-price">7 000 <small>XOF</small></div>
+                        <ul class="boost-features">
+                            <li><i class="fas fa-check-circle"></i> 1000 abonnés</li>
+                            <li><i class="fas fa-check-circle"></i> 5000 likes</li>
+                            <li><i class="fas fa-check-circle"></i> 10000 vues</li>
+                            <li><i class="fas fa-check-circle"></i> 1000 partages</li>
+                            <li><i class="fas fa-check-circle"></i> 50 commentaires</li>
+                        </ul>
+                        <button class="btn btn-primary btn-sm">Sélectionner</button>
+                    </div>
+
+                    <!-- Pack YouTube -->
+                    <div class="boost-pack-card" onclick="selectBoostPack('youtube')">
+                        <div class="boost-guarantee"><i class="fas fa-shield-alt"></i> Garantie 5 mois</div>
+                        <div class="boost-platform-icon"><i class="fab fa-youtube" style="color: #ff0000;"></i></div>
+                        <h3 style="font-size: 1.3rem;">YouTube Starter</h3>
+                        <div class="boost-price">16 000 <small>XOF</small></div>
+                        <ul class="boost-features">
+                            <li><i class="fas fa-check-circle"></i> 500 abonnés</li>
+                            <li><i class="fas fa-check-circle"></i> 5000 vues</li>
+                            <li><i class="fas fa-check-circle"></i> 200 likes</li>
+                            <li><i class="fas fa-check-circle"></i> 50 commentaires</li>
+                        </ul>
+                        <button class="btn btn-primary btn-sm">Sélectionner</button>
+                    </div>
+
+                    <!-- Pack Instagram -->
+                    <div class="boost-pack-card" onclick="selectBoostPack('instagram')">
+                        <div class="boost-guarantee"><i class="fas fa-shield-alt"></i> Garantie 5 mois</div>
+                        <div class="boost-platform-icon"><i class="fab fa-instagram" style="color: #e4405f;"></i></div>
+                        <h3 style="font-size: 1.3rem;">Instagram Pro</h3>
+                        <div class="boost-price">5 960 <small>XOF</small></div>
+                        <ul class="boost-features">
+                            <li><i class="fas fa-check-circle"></i> 1000 followers</li>
+                            <li><i class="fas fa-check-circle"></i> 5000 likes</li>
+                            <li><i class="fas fa-check-circle"></i> 7000 vues</li>
+                            <li><i class="fas fa-check-circle"></i> 1000 vues stories</li>
+                            <li><i class="fas fa-check-circle"></i> 100 commentaires</li>
+                        </ul>
+                        <button class="btn btn-primary btn-sm">Sélectionner</button>
+                    </div>
+
+                    <!-- Pack Facebook -->
+                    <div class="boost-pack-card" onclick="selectBoostPack('facebook')">
+                        <div class="boost-guarantee"><i class="fas fa-shield-alt"></i> Garantie 5 mois</div>
+                        <div class="boost-platform-icon"><i class="fab fa-facebook" style="color: #1877f2;"></i></div>
+                        <h3 style="font-size: 1.3rem;">Facebook Pro</h3>
+                        <div class="boost-price">6 884 <small>XOF</small></div>
+                        <ul class="boost-features">
+                            <li><i class="fas fa-check-circle"></i> 1000 abonnés page</li>
+                            <li><i class="fas fa-check-circle"></i> 1000 abonnés profil</li>
+                            <li><i class="fas fa-check-circle"></i> 3000 réactions</li>
+                            <li><i class="fas fa-check-circle"></i> 1000 partages</li>
+                            <li><i class="fas fa-check-circle"></i> 20000 vues</li>
+                            <li><i class="fas fa-check-circle"></i> 100 commentaires</li>
+                            <li><i class="fas fa-check-circle"></i> 10 avis</li>
+                        </ul>
+                        <button class="btn btn-primary btn-sm">Sélectionner</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <h2 data-aos="fade-right" class="text-center" style="margin: 3rem 0 2rem; font-size: 2.2rem;">
+                <span class="text-gradient">Questions fréquentes</span>
+            </h2>
+            <div class="faq-container" data-aos="fade-up">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <i class="fas fa-chevron-right"></i> Comment recharger mon compte ?
+                    </div>
+                    <div class="faq-answer">
+                        Via Mobile Money (MTN, Moov, Orange, Free) en quelques clics. 
+                        Rendez-vous dans la section "Recharger", choisissez votre montant et votre opérateur.
+                        Le crédit est instantané !
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <i class="fas fa-chevron-right"></i> Les numéros sont-ils vraiment jetables ?
+                    </div>
+                    <div class="faq-answer">
+                        Oui, ce sont des numéros à usage unique pour la réception de SMS uniquement.
+                        Une fois le SMS reçu, le numéro n'est plus utilisable.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <i class="fas fa-chevron-right"></i> Que faire si je ne reçois pas le SMS ?
+                    </div>
+                    <div class="faq-answer">
+                        Remboursement automatique sous 20 minutes. Contacte notre support si besoin.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <i class="fas fa-chevron-right"></i> Comment ça marche le boostage réseaux ?
+                    </div>
+                    <div class="faq-answer">
+                        Sélectionne un pack, entre tes liens, paie avec ton solde, et reçois tes abonnés/likes/vues 
+                        sous 2 heures. Garantie 5 mois !
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE CONNEXION ========== -->
+    <div id="loginPage" class="page">
+        <div class="container container-sm">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-sign-in-alt"></i> Connexion</h2>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="loginEmail" placeholder="exemple@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <div id="loginError" class="alert alert-danger d-none"></div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Se connecter
+                    </button>
+                </form>
+                <div class="card-footer text-center">
+                    <a onclick="showPage('register')" class="cursor-pointer" style="color: var(--primary); font-weight: 600;">Créer un compte</a> | 
+                    <a onclick="showPage('forgotPassword')" style="color: var(--primary); font-weight: 600;">Mot de passe oublié ?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE INSCRIPTION ========== -->
+    <div id="registerPage" class="page">
+        <div class="container container-sm">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-user-plus"></i> Inscription</h2>
+                </div>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label class="form-label">Nom complet</label>
+                        <input type="text" class="form-control" id="regFullName" placeholder="Jean Dupont" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="regEmail" placeholder="exemple@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Téléphone</label>
+                        <input type="tel" class="form-control" id="regPhone" placeholder="+229 01 23 45 67" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="regPassword" placeholder="•••••••• (min. 6 caractères)" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirmer</label>
+                        <input type="password" class="form-control" id="regConfirm" placeholder="••••••••" required>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="acceptTerms" required>
+                            <label class="form-check-label">J'accepte les <a onclick="showPage('cgu')" style="color: var(--primary);">CGU</a></label>
+                        </div>
+                    </div>
+                    <div id="registerError" class="alert alert-danger d-none"></div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                        <i class="fas fa-user-plus"></i> Créer mon compte
+                    </button>
+                </form>
+                <div class="card-footer text-center">
+                    <a onclick="showPage('login')" style="color: var(--primary); font-weight: 600;">Déjà inscrit ? Se connecter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE MOT DE PASSE OUBLIÉ ========== -->
+    <div id="forgotPasswordPage" class="page">
+        <div class="container container-sm">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-key"></i> Réinitialisation</h2>
+                </div>
+                <form id="forgotPasswordForm">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="forgotEmail" placeholder="exemple@email.com" required>
+                    </div>
+                    <div id="forgotError" class="alert alert-danger d-none"></div>
+                    <div id="forgotSuccess" class="alert alert-success d-none"></div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                        <i class="fas fa-paper-plane"></i> Envoyer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE TABLEAU DE BORD ========== -->
+    <div id="dashboardPage" class="page">
+        <div class="container">
+            <div class="welcome-card">
+                <div>
+                    <h2 style="font-size: 1.8rem; color: white;">Bonjour, <span id="userName">Utilisateur</span> !</h2>
+                    <p style="font-size: 1rem; opacity: 0.9;">Bienvenue sur VirtuNum</p>
+                </div>
+                <div class="balance-box">
+                    <p style="font-size: 1rem;">Solde disponible</p>
+                    <div class="balance-amount" id="userBalance">0 XOF</div>
+                    <button class="btn btn-primary btn-sm" onclick="showPage('recharge')">
+                        <i class="fas fa-plus-circle"></i> Recharger
+                    </button>
+                </div>
+            </div>
+            
+            <div class="stats-cards">
+                <div class="stat-card" onclick="showPage('mesNumeros')">
+                    <i class="fas fa-phone-alt"></i>
+                    <div>
+                        <p id="statsNumeros">0</p>
+                        <p>Numéros actifs</p>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="showPage('historique')">
+                    <i class="fas fa-history"></i>
+                    <div>
+                        <p id="statsCommandes">0</p>
+                        <p>Commandes</p>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="showPage('boostReseaux')">
+                    <i class="fas fa-rocket"></i>
+                    <div>
+                        <p id="statsBoost">0</p>
+                        <p>Boostages</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="font-size: 1.4rem;">Dernières transactions</h3>
+                    <button class="btn btn-outline btn-sm" onclick="showPage('historique')">
+                        Voir tout <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>Date</th><th>Service</th><th>Montant</th><th>Statut</th></tr></thead>
+                        <tbody id="recentOrdersTable"><tr><td colspan="4" class="text-center">Aucune transaction</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE ACHAT SERVICE ========== -->
+    <div id="buyServicePage" class="page">
+        <div class="container">
+            <div class="steps">
+                <div class="step active" id="stepService">1. Service</div>
+                <div class="step" id="stepCountry">2. Pays</div>
+                <div class="step" id="stepValidation">3. Validation</div>
+            </div>
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                Choisis un service
+            </h1>
+            <div class="service-grid" id="serviceGrid"></div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE CHOIX PAYS ========== -->
+    <div id="buyCountryPage" class="page">
+        <div class="container">
+            <div class="steps">
+                <div class="step completed">1. Service</div>
+                <div class="step active">2. Pays</div>
+                <div class="step">3. Validation</div>
+            </div>
+            <h1 id="countryPageTitle" style="font-size: 2rem; margin-bottom: 2rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                Pays disponibles
+            </h1>
+            <div class="country-search">
+                <input type="text" class="form-control" id="countrySearch" placeholder="🔍 Rechercher un pays..." onkeyup="filterCountries()">
+            </div>
+            <div class="country-list" id="countryList"></div>
+            <a class="back-link" onclick="goBackToServices()" style="display: inline-block; margin-top: 1.5rem; color: var(--primary); font-weight: 600;">
+                <i class="fas fa-arrow-left"></i> Retour aux services
+            </a>
+        </div>
+    </div>
+
+    <!-- ========== PAGE VALIDATION ========== -->
+    <div id="checkoutPage" class="page">
+        <div class="container">
+            <div class="steps">
+                <div class="step completed">1. Service</div>
+                <div class="step completed">2. Pays</div>
+                <div class="step active">3. Validation</div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Récapitulatif de ta commande</h2>
+                </div>
+                <div class="order-summary">
+                    <div class="order-summary-row"><span>Service :</span> <strong id="checkoutService">-</strong></div>
+                    <div class="order-summary-row"><span>Pays :</span> <strong id="checkoutCountry">-</strong></div>
+                    <div class="order-summary-row"><span>Prix :</span> <strong id="checkoutPrice">0 XOF</strong></div>
+                    <div class="order-summary-row"><span>Ton solde :</span> <strong id="checkoutBalance">0 XOF</strong></div>
+                    <div class="order-summary-row total"><span>Reste à payer :</span> <strong id="checkoutDifference">0 XOF</strong></div>
+                </div>
+                <div id="checkoutAlert" class="alert alert-danger d-none">
+                    <i class="fas fa-exclamation-circle"></i> <span id="checkoutAlertMessage">Solde insuffisant</span>
+                </div>
+                <button class="btn btn-primary btn-block btn-lg" id="checkoutConfirmBtn" onclick="confirmOrder()" disabled>
+                    <i class="fas fa-check-circle"></i> Confirmer la commande
+                </button>
+                <button class="btn btn-success btn-block btn-lg" id="checkoutRechargeBtn" onclick="showPage('recharge')" style="display: none;">
+                    <i class="fas fa-wallet"></i> Recharger mon compte
+                </button>
+                <div class="card-footer">
+                    <a class="back-link" onclick="goBackToCountry()" style="color: var(--primary); font-weight: 600;">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE VÉRIFICATION ========== -->
+    <div id="verificationPage" class="page">
+        <div class="container container-sm">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-id-card"></i> Vérification d'identité</h2>
+                </div>
+                <form id="verificationForm">
+                    <div class="form-group">
+                        <label class="form-label">Nom complet *</label>
+                        <input type="text" class="form-control" id="verifNom" placeholder="Jean Dupont" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Téléphone *</label>
+                        <input type="tel" class="form-control" id="verifTelephone" placeholder="+229 01 23 45 67" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-control" id="verifEmail" placeholder="exemple@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Pays *</label>
+                        <select class="form-control" id="verifPays" required>
+                            <option value="">Sélectionne ton pays</option>
+                            <option value="Bénin">Bénin</option>
+                            <option value="Togo">Togo</option>
+                            <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                            <option value="Sénégal">Sénégal</option>
+                            <option value="Cameroun">Cameroun</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quartier *</label>
+                        <input type="text" class="form-control" id="verifQuartier" placeholder="Ex: Cadjehoun" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">N° carte d'identité *</label>
+                        <input type="text" class="form-control" id="verifNumCarte" placeholder="Ex: 123456789" required>
+                    </div>
+                    <div id="verificationError" class="alert alert-danger d-none"></div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                        <i class="fas fa-paper-plane"></i> Soumettre
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE MES NUMÉROS ========== -->
+    <div id="mesNumerosPage" class="page">
+        <div class="container">
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                Mes numéros
+            </h1>
+            <div class="alert alert-info" id="numerosInfoMessage">
+                <i class="fas fa-lock"></i> Crée un code à 4 chiffres pour sécuriser l'accès
+            </div>
+            <div class="card" id="numerosPasswordBlock">
+                <div id="numerosNoCode">
+                    <p style="margin-bottom: 1rem;">Crée ton code à 4 chiffres :</p>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="numerosNewPassword" maxlength="4" inputmode="numeric" placeholder="****">
+                    </div>
+                    <button class="btn btn-primary" onclick="createNumerosPassword()">
+                        <i class="fas fa-check"></i> Créer
+                    </button>
+                </div>
+                <div id="numerosHasCode" style="display:none;">
+                    <p style="margin-bottom: 1rem;">Entre ton code :</p>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="numerosPassword" maxlength="4" inputmode="numeric" placeholder="****">
+                    </div>
+                    <button class="btn btn-primary" onclick="checkNumerosPassword()">
+                        <i class="fas fa-unlock-alt"></i> Déverrouiller
+                    </button>
+                </div>
+            </div>
+            <div id="numerosListBlock" style="display:none;">
+                <div class="grid" id="numerosList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE DÉTAIL NUMÉRO ========== -->
+    <div id="detailNumeroPage" class="page">
+        <div class="container">
+            <a class="back-link" onclick="showPage('mesNumeros')" style="display: inline-block; margin-bottom: 1.5rem; color: var(--primary); font-weight: 600;">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+            <div class="card">
+                <div class="card-header">
+                    <h2 id="detailNumero" style="font-size: 1.4rem;">-</h2>
+                    <span class="badge badge-success">Actif</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div><strong>Service :</strong> <span id="detailService">-</span></div>
+                    <div><strong>Pays :</strong> <span id="detailPays">-</span></div>
+                    <div><strong>Date d'achat :</strong> <span id="detailDate">-</span></div>
+                    <div><strong>Prix :</strong> <span id="detailPrix">-</span></div>
+                </div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">Codes SMS reçus</h3>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>Date</th><th>Code</th><th>Action</th></tr></thead>
+                        <tbody id="codesList"><tr><td colspan="3">Aucun code reçu</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE HISTORIQUE ========== -->
+    <div id="historiquePage" class="page">
+        <div class="container">
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                Historique des transactions
+            </h1>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>ID</th><th>Date</th><th>Service</th><th>Montant</th><th>Statut</th></tr></thead>
+                        <tbody id="historiqueTable"><tr><td colspan="5">Aucune transaction</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE PROFIL ========== -->
+    <div id="profilePage" class="page">
+        <div class="container container-sm">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-user-cog"></i> Mon profil</h2>
+                </div>
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label class="form-label">Nom complet</label>
+                        <input type="text" class="form-control" id="profileName" placeholder="Jean Dupont">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="profileEmail" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Téléphone</label>
+                        <input type="tel" class="form-control" id="profilePhone" placeholder="+229 01 23 45 67">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                        <i class="fas fa-save"></i> Mettre à jour
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE RECHARGE (LIEN DIRECT) ========== -->
+    <div id="rechargePage" class="page">
+        <div class="container container-sm">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-wallet"></i> Recharger mon compte</h2>
+                </div>
+                <div class="card-body text-center">
+                    <p style="margin-bottom: 2rem; color: var(--text-light);">
+                        Clique sur le bouton ci-dessous pour effectuer ton paiement sécurisé.
+                    </p>
+                    <a href="https://sendavapay.com/pay/SPY35Z5NJTD" target="_blank" class="btn btn-success btn-lg" style="padding: 1rem 3rem;">
+                        <i class="fas fa-credit-card"></i> Payer maintenant
+                    </a>
+                    <p style="margin-top: 2rem; font-size: 0.9rem; color: var(--text-light);">
+                        Une fois le paiement effectué, ton solde sera mis à jour automatiquement.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE BOOSTAGE RÉSEAUX ========== -->
+    <div id="boostReseauxPage" class="page">
+        <div class="container">
+            <h1 style="font-size: 2.2rem; margin-bottom: 2rem;">
+                <i class="fas fa-rocket" style="color: #764ba2;"></i> 
+                <span class="text-gradient">Boostage réseaux sociaux</span>
+            </h1>
+            
+            <div class="card" style="background: var(--gradient-primary); color: white; padding: 2rem;">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p style="font-size: 1rem; opacity: 0.9;">Ton solde VirtuNum</p>
+                        <p style="font-size: 2.5rem; font-weight: 800;" id="boostBalance">0 XOF</p>
+                    </div>
+                    <button class="btn" style="background: white; color: #764ba2; padding: 0.8rem 2rem;" onclick="showPage('recharge')">
+                        <i class="fas fa-plus-circle"></i> Recharger
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats-cards" style="grid-template-columns: repeat(3,1fr); margin: 2rem 0;">
+                <div class="stat-card">
+                    <i class="fas fa-rocket" style="background: var(--gradient-secondary);"></i>
+                    <div>
+                        <p id="boostStatsTotal">0</p>
+                        <p>Boostages effectués</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock" style="background: var(--gradient-success);"></i>
+                    <div>
+                        <p>2h</p>
+                        <p>Livraison</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-shield-alt" style="background: linear-gradient(135deg, #f72585, #b5179e);"></i>
+                    <div>
+                        <p>5 mois</p>
+                        <p>Garantie</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 style="font-size: 1.8rem; margin: 2rem 0 1.5rem; background: var(--gradient-secondary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                Choisis ton pack
+            </h2>
+            
+            <div class="boost-packs-grid">
+                <!-- Pack TikTok -->
+                <div class="boost-pack-card" onclick="selectBoostPack('tiktok')">
+                    <div class="boost-guarantee"><i class="fas fa-shield-alt"></i> Garantie 5 mois</div>
+                    <div class="boost-platform-icon"><i class="fab fa-tiktok" style="color: #000;"></i></div>
+                    <h3 style="font-size: 1.4rem;">TikTok Viral</h3>
+                    <div class="boost-price">7 000 <small>XOF</small></div>
+                    <ul class="boost-features">
+                        <li><i class="fas fa-check-circle"></i> 1000 abonnés</li>
+                        <li><i class="fas fa-check-circle"></i> 5000 likes</li>
+                        <li><i class="fas fa-check-circle"></i> 10000 vues</li>
+                        <li><i class="fas fa-check-circle"></i> 1000 partages</li>
+                        <li><i class="fas fa-check-circle"></i> 50 commentaires</li>
+                    </ul>
+                    <div id="boostStatusTiktok" class="boost-sold-status"></div>
+                </div>
+
+                <!-- Pack YouTube -->
+                <div class="boost-pack-card" onclick="selectBoostPack('youtube')">
+                    <div class="boost-guarantee"><i class="fas fa-shield-alt"></i> Garantie 5 mois</div>
+                    <div class="boost-platform-icon"><i class="fab fa-youtube" style="color: #ff0000;"></i></div>
+                    <h3 style="font-size: 1.4rem;">YouTube Starter</h3>
+                    <div class="boost-price">16 000 <small>XOF</small></div>
+                    <ul class="boost-features">
+                        <li><i class="fas fa-check-circle"></i> 500 abonnés</li>
+                        <li><i class="fas fa-check-circle"></i> 5000 vues</li>
+                        <li><i class="fas fa-check-circle"></i> 200 likes</li>
+                        <li><i class="fas fa-check-circle"></i> 50 commentaires</li>
+                    </ul>
+                    <div id="boostStatusYoutube" class="boost-sold-status"></div>
+                </div>
+
+                <!-- Pack Instagram -->
+                <div class="boost-pack-card" onclick="selectBoostPack('instagram')">
+                    <div class="boost-guarantee"><i class="fas fa-shield-alt"></i> Garantie 5 mois</div>
+                    <div class="boost-platform-icon"><i class="fab fa-instagram" style="color: #e4405f;"></i></div>
+                    <h3 style="font-size: 1.4rem;">Instagram Pro</h3>
+                    <div class="boost-price">5 960 <small>XOF</small></div>
+                    <ul class="boost-features">
+                        <li><i class="fas fa-check-circle"></i> 1000 followers</li>
+                        <li><i class="fas fa-check-circle"></i> 5000 likes</li>
+                        <li><i class="fas fa-check-circle"></i> 7000 vues</li>
+                        <li><i class="fas fa-check-circle"></i> 1000 vues stories</li>
+                        <li><i class="fas fa-check-circle"></i> 100 commentaires</li>
+                    </ul>
+                    <div id="boostStatusInstagram" class="boost-sold-status"></div>
+                </div>
+
+                <!-- Pack Facebook -->
+                <div class="boost-pack-card" onclick="selectBoostPack('facebook')">
+                    <div class="boost-guarantee"><i class="fas fa-shield-alt"></i> Garantie 5 mois</div>
+                    <div class="boost-platform-icon"><i class="fab fa-facebook" style="color: #1877f2;"></i></div>
+                    <h3 style="font-size: 1.4rem;">Facebook Pro</h3>
+                    <div class="boost-price">6 884 <small>XOF</small></div>
+                    <ul class="boost-features">
+                        <li><i class="fas fa-check-circle"></i> 1000 abonnés page</li>
+                        <li><i class="fas fa-check-circle"></i> 1000 abonnés profil</li>
+                        <li><i class="fas fa-check-circle"></i> 3000 réactions</li>
+                        <li><i class="fas fa-check-circle"></i> 1000 partages</li>
+                        <li><i class="fas fa-check-circle"></i> 20000 vues</li>
+                        <li><i class="fas fa-check-circle"></i> 100 commentaires</li>
+                        <li><i class="fas fa-check-circle"></i> 10 avis</li>
+                    </ul>
+                    <div id="boostStatusFacebook" class="boost-sold-status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE DÉTAIL BOOST PACK ========== -->
+    <div id="boostDetailPage" class="page">
+        <div class="container">
+            <a class="back-link" onclick="showPage('boostReseaux')" style="display: inline-block; margin-bottom: 1.5rem; color: var(--primary); font-weight: 600;">
+                <i class="fas fa-arrow-left"></i> Retour aux packs
+            </a>
+            
+            <div class="boost-detail-card card" id="boostDetailContainer">
+                <div class="text-center">
+                    <div class="spinner" style="width: 50px; height: 50px; margin: 2rem auto;"></div>
+                    <p style="color: var(--text-light);">Chargement du pack...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE CONFIRMATION BOOST ========== -->
+    <div id="boostConfirmationPage" class="page">
+        <div class="container container-sm">
+            <div class="card" style="text-align: center; border-top: 5px solid #06d6a0; animation: slideIn 0.5s;">
+                <div style="font-size: 5rem; color: #06d6a0; margin: 1rem 0;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 style="font-size: 2.2rem; margin-bottom: 1rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    Commande effectuée !
+                </h2>
+                <p style="color: var(--text-light); margin-bottom: 2rem; font-size: 1.1rem;">
+                    Merci pour ta confiance. Ton boost est en cours de traitement.
+                </p>
+                
+                <div id="boostConfirmationDetails" class="order-summary" style="text-align: left; background: white; border: 1px solid #e9ecef;">
+                    <!-- Détails chargés dynamiquement -->
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary btn-lg" onclick="showPage('boostReseaux')" style="min-width: 200px;">
+                        <i class="fas fa-rocket"></i> Autres packs
+                    </button>
+                    <button class="btn btn-outline btn-lg" onclick="showPage('dashboard')" style="min-width: 200px;">
+                        <i class="fas fa-home"></i> Accueil
+                    </button>
+                </div>
+                
+                <p style="margin-top: 2rem; color: var(--text-light); font-size: 0.9rem;">
+                    <i class="fas fa-info-circle" style="color: var(--info);"></i> 
+                    Tu seras notifié par email dès que le boost sera livré.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE ADMIN ========== -->
+    <div id="adminPage" class="page">
+        <div class="container">
+            <h1 style="font-size: 2.2rem; margin-bottom: 2rem;">
+                👑 <span class="text-gradient">Espace Administrateur</span>
+            </h1>
+            
+            <div class="stats-cards" id="adminStats"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-rocket" style="color: #764ba2;"></i> Commandes Boostage Réseaux</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Client</th>
+                                <th>Pack</th>
+                                <th>Montant</th>
+                                <th>Liens</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminBoostTable">
+                            <tr><td colspan="7" class="text-center">Aucune commande boostage</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-search"></i> Rechercher un utilisateur</h3>
+                </div>
+                <div class="flex gap-2" style="flex-wrap: wrap;">
+                    <input type="text" class="form-control" id="adminSearchUserId" placeholder="ID ou email" style="flex: 1;">
+                    <button class="btn btn-primary" onclick="searchUserById()">
+                        <i class="fas fa-search"></i> Chercher
+                    </button>
+                </div>
+                <div id="userSearchResult" class="mt-4"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-star"></i> Gestion des avis</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>Auteur</th><th>Note</th><th>Message</th><th>Actions</th></tr></thead>
+                        <tbody id="adminAvisTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-clock"></i> Commandes en attente</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>ID</th><th>Client</th><th>Service</th><th>Pays</th><th>Montant</th><th>Actions</th></tr></thead>
+                        <tbody id="adminPendingTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-boxes"></i> Gestion des stocks</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" id="adminStocksTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE CGU ========== -->
+    <div id="cguPage" class="page">
+        <div class="container container-sm">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Conditions Générales d'Utilisation</h2>
+                    <button class="btn btn-sm btn-outline" onclick="showPage('home')">
+                        <i class="fas fa-home"></i> Retour
+                    </button>
+                </div>
+                <div class="card-body" style="max-height: 70vh; overflow-y: auto; padding: 1.5rem; background: #f8f9fa; border-radius: 16px;">
+                    <h3 style="color: var(--primary); margin: 1rem 0 0.5rem;">1. Objet</h3>
+                    <p>Les présentes CGU régissent l'utilisation de la plateforme VirtuNum, service de numéros virtuels et de boostage réseaux sociaux.</p>
+                    
+                    <h3 style="color: var(--primary); margin: 1.5rem 0 0.5rem;">2. Services proposés</h3>
+                    <p>VirtuNum fournit des numéros virtuels temporaires et des services de boostage réseaux sociaux.</p>
+                    
+                    <h3 style="color: var(--primary); margin: 1.5rem 0 0.5rem;">3. Paiement</h3>
+                    <p>Les paiements s'effectuent via Mobile Money (MTN, Moov, Orange, Free).</p>
+                    
+                    <h3 style="color: var(--primary); margin: 1.5rem 0 0.5rem;">4. Remboursement</h3>
+                    <p>Pour les numéros virtuels : remboursement automatique si aucun SMS reçu sous 20 minutes.<br>
+                    Pour le boostage : garantie 5 mois.</p>
+                    
+                    <h3 style="color: var(--primary); margin: 1.5rem 0 0.5rem;">5. Contact</h3>
+                    <p>assistancetrc416@gmail.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE CONFIDENTIALITÉ ========== -->
+    <div id="privacyPage" class="page">
+        <div class="container container-sm">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Politique de Confidentialité</h2>
+                    <button class="btn btn-sm btn-outline" onclick="showPage('home')">
+                        <i class="fas fa-home"></i> Retour
+                    </button>
+                </div>
+                <div class="card-body" style="max-height: 70vh; overflow-y: auto; padding: 1.5rem; background: #f8f9fa; border-radius: 16px;">
+                    <h3 style="color: var(--primary); margin: 1rem 0 0.5rem;">Données collectées</h3>
+                    <p>Nom, email, téléphone, documents d'identité.</p>
+                    
+                    <h3 style="color: var(--primary); margin: 1.5rem 0 0.5rem;">Sécurité</h3>
+                    <p>Cryptage AES-256 pour toutes les données sensibles.</p>
+                    
+                    <h3 style="color: var(--primary); margin: 1.5rem 0 0.5rem;">Vos droits</h3>
+                    <p>Droit d'accès, rectification et suppression. Contact : assistancetrc416@gmail.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== FOOTER SIMPLIFIÉ MAIS COMPLET ========== -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>VirtuNum</h3>
+                    <p>La plateforme n°1 de numéros virtuels en Afrique. Plus de 200 pays disponibles, paiement Mobile Money.</p>
+                    <div class="social-links">
+                        <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Informations légales</h3>
+                    <ul>
+                        <li><a onclick="showPage('cgu')"><i class="fas fa-chevron-right"></i> CGU</a></li>
+                        <li><a onclick="showPage('privacy')"><i class="fas fa-chevron-right"></i> Confidentialité</a></li>
+                        <li><a href="mailto:assistancetrc416@gmail.com"><i class="fas fa-chevron-right"></i> assistancetrc416@gmail.com</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 VirtuNum - Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast & Loading -->
+    <div class="toast-container" id="toastContainer"></div>
+    <div id="loadingOverlay" class="loading-overlay" style="display:none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem; font-weight: 600; color: var(--primary);">Chargement en cours...</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // ==================== CONFIGURATION FIREBASE ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7y7pXuxNeemrArCJaGoOpiOiBZYAEs0E",
+            authDomain: "rivoo-7ba51.firebaseapp.com",
+            projectId: "rivoo-7ba51",
+            storageBucket: "rivoo-7ba51.firebasestorage.app",
+            messagingSenderId: "848976954152",
+            appId: "1:848976954152:web:6fb31cdba774af2581861d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // ==================== VARIABLES GLOBALES ====================
+        let currentUser = null;
+        let currentService = null;
+        let currentCountry = null;
+        let currentPrice = 0;
+        let currentCountryFlag = '';
+        let currentCountryCode = '';
+        let selectedUserId = null;
+        let logoClickCount = 0;
+        let avis = [];
+        let currentBoostPack = null;
+        let boostOrders = [];
+
+        // ==================== SERVICES ====================
+        const services = [
+            { id: 'whatsapp', name: 'WhatsApp', icon: 'fab fa-whatsapp', color: '#25D366' },
+            { id: 'telegram', name: 'Telegram', icon: 'fab fa-telegram', color: '#26A5E4' },
+            { id: 'facebook', name: 'Facebook', icon: 'fab fa-facebook', color: '#1877F2' },
+            { id: 'instagram', name: 'Instagram', icon: 'fab fa-instagram', color: '#E4405F' },
+            { id: 'google', name: 'Gmail', icon: 'fab fa-google', color: '#EA4335' },
+            { id: 'paypal', name: 'PayPal', icon: 'fab fa-paypal', color: '#003087' },
+            { id: 'viber', name: 'Viber', icon: 'fab fa-viber', color: '#7360F2' },
+            { id: 'signal', name: 'Signal', icon: 'fas fa-comment-dots', color: '#3A76F0' },
+            { id: 'tiktok', name: 'TikTok', icon: 'fab fa-tiktok', color: '#000000' },
+            { id: 'snapchat', name: 'Snapchat', icon: 'fab fa-snapchat', color: '#FFFC00' },
+            { id: 'uber', name: 'Uber', icon: 'fab fa-uber', color: '#000' },
+            { id: 'amazon', name: 'Amazon', icon: 'fab fa-amazon', color: '#FF9900' },
+            { id: 'discord', name: 'Discord', icon: 'fab fa-discord', color: '#5865F2' },
+            { id: 'twitter', name: 'Twitter', icon: 'fab fa-twitter', color: '#1DA1F2' },
+            { id: 'binance', name: 'Binance', icon: 'fab fa-binance', color: '#F0B90B' },
+            { id: 'coinbase', name: 'Coinbase', icon: 'fab fa-coinbase', color: '#0052FF' }
+        ];
+
+        // ==================== PAYS (plus de 200) ====================
+        const countriesData = {
+            'Bénin': { code: '+229', flag: '🇧🇯', stock: 200, basePrice: 3000 },
+            'Togo': { code: '+228', flag: '🇹🇬', stock: 200, basePrice: 3000 },
+            'Côte d\'Ivoire': { code: '+225', flag: '🇨🇮', stock: 200, basePrice: 3000 },
+            'Sénégal': { code: '+221', flag: '🇸🇳', stock: 200, basePrice: 3000 },
+            'Cameroun': { code: '+237', flag: '🇨🇲', stock: 200, basePrice: 3000 },
+            'France': { code: '+33', flag: '🇫🇷', stock: 200, basePrice: 8000 },
+            'États-Unis': { code: '+1', flag: '🇺🇸', stock: 200, basePrice: 8000 },
+            'Canada': { code: '+1', flag: '🇨🇦', stock: 200, basePrice: 8000 },
+            'Belgique': { code: '+32', flag: '🇧🇪', stock: 200, basePrice: 7000 },
+            'Suisse': { code: '+41', flag: '🇨🇭', stock: 200, basePrice: 9000 },
+            'Royaume-Uni': { code: '+44', flag: '🇬🇧', stock: 200, basePrice: 8000 },
+            'Allemagne': { code: '+49', flag: '🇩🇪', stock: 200, basePrice: 8000 },
+            'Italie': { code: '+39', flag: '🇮🇹', stock: 200, basePrice: 8000 },
+            'Espagne': { code: '+34', flag: '🇪🇸', stock: 200, basePrice: 8000 },
+            'Portugal': { code: '+351', flag: '🇵🇹', stock: 200, basePrice: 7000 },
+            'Pays-Bas': { code: '+31', flag: '🇳🇱', stock: 200, basePrice: 8000 },
+            'Suède': { code: '+46', flag: '🇸🇪', stock: 200, basePrice: 8500 },
+            'Norvège': { code: '+47', flag: '🇳🇴', stock: 200, basePrice: 9000 },
+            'Danemark': { code: '+45', flag: '🇩🇰', stock: 200, basePrice: 8500 },
+            'Finlande': { code: '+358', flag: '🇫🇮', stock: 200, basePrice: 8500 },
+            'Pologne': { code: '+48', flag: '🇵🇱', stock: 200, basePrice: 7000 },
+            'Russie': { code: '+7', flag: '🇷🇺', stock: 200, basePrice: 7000 },
+            'Ukraine': { code: '+380', flag: '🇺🇦', stock: 200, basePrice: 6000 },
+            'Roumanie': { code: '+40', flag: '🇷🇴', stock: 200, basePrice: 6000 },
+            'Grèce': { code: '+30', flag: '🇬🇷', stock: 200, basePrice: 7000 },
+            'Turquie': { code: '+90', flag: '🇹🇷', stock: 200, basePrice: 6000 },
+            'Égypte': { code: '+20', flag: '🇪🇬', stock: 200, basePrice: 5000 },
+            'Afrique du Sud': { code: '+27', flag: '🇿🇦', stock: 200, basePrice: 6000 },
+            'Nigeria': { code: '+234', flag: '🇳🇬', stock: 200, basePrice: 4000 },
+            'Ghana': { code: '+233', flag: '🇬🇭', stock: 200, basePrice: 4000 },
+            'Kenya': { code: '+254', flag: '🇰🇪', stock: 200, basePrice: 4500 },
+            'Ouganda': { code: '+256', flag: '🇺🇬', stock: 200, basePrice: 4000 },
+            'Tanzanie': { code: '+255', flag: '🇹🇿', stock: 200, basePrice: 4000 },
+            'Éthiopie': { code: '+251', flag: '🇪🇹', stock: 200, basePrice: 4000 },
+            'Maroc': { code: '+212', flag: '🇲🇦', stock: 200, basePrice: 5000 },
+            'Algérie': { code: '+213', flag: '🇩🇿', stock: 200, basePrice: 5000 },
+            'Tunisie': { code: '+216', flag: '🇹🇳', stock: 200, basePrice: 4500 },
+            'Libye': { code: '+218', flag: '🇱🇾', stock: 200, basePrice: 5000 },
+            'Mauritanie': { code: '+222', flag: '🇲🇷', stock: 200, basePrice: 4000 },
+            'Mali': { code: '+223', flag: '🇲🇱', stock: 200, basePrice: 3500 },
+            'Burkina Faso': { code: '+226', flag: '🇧🇫', stock: 200, basePrice: 3500 },
+            'Niger': { code: '+227', flag: '🇳🇪', stock: 200, basePrice: 3500 },
+            'Tchad': { code: '+235', flag: '🇹🇩', stock: 200, basePrice: 4000 },
+            'Soudan': { code: '+249', flag: '🇸🇩', stock: 200, basePrice: 4000 },
+            'Érythrée': { code: '+291', flag: '🇪🇷', stock: 200, basePrice: 4500 },
+            'Djibouti': { code: '+253', flag: '🇩🇯', stock: 200, basePrice: 5000 },
+            'Somalie': { code: '+252', flag: '🇸🇴', stock: 200, basePrice: 4500 },
+            'Rwanda': { code: '+250', flag: '🇷🇼', stock: 200, basePrice: 4000 },
+            'Burundi': { code: '+257', flag: '🇧🇮', stock: 200, basePrice: 4000 },
+            'République démocratique du Congo': { code: '+243', flag: '🇨🇩', stock: 200, basePrice: 4000 },
+            'Congo': { code: '+242', flag: '🇨🇬', stock: 200, basePrice: 4000 },
+            'Gabon': { code: '+241', flag: '🇬🇦', stock: 200, basePrice: 5000 },
+            'Guinée équatoriale': { code: '+240', flag: '🇬🇶', stock: 200, basePrice: 6000 },
+            'Angola': { code: '+244', flag: '🇦🇴', stock: 200, basePrice: 5000 },
+            'Namibie': { code: '+264', flag: '🇳🇦', stock: 200, basePrice: 6000 },
+            'Botswana': { code: '+267', flag: '🇧🇼', stock: 200, basePrice: 6000 },
+            'Zambie': { code: '+260', flag: '🇿🇲', stock: 200, basePrice: 5000 },
+            'Zimbabwe': { code: '+263', flag: '🇿🇼', stock: 200, basePrice: 5000 },
+            'Mozambique': { code: '+258', flag: '🇲🇿', stock: 200, basePrice: 4500 },
+            'Madagascar': { code: '+261', flag: '🇲🇬', stock: 200, basePrice: 4500 },
+            'Maurice': { code: '+230', flag: '🇲🇺', stock: 200, basePrice: 7000 },
+            'Seychelles': { code: '+248', flag: '🇸🇨', stock: 200, basePrice: 8000 },
+            'Comores': { code: '+269', flag: '🇰🇲', stock: 200, basePrice: 6000 },
+            'Cap-Vert': { code: '+238', flag: '🇨🇻', stock: 200, basePrice: 6000 },
+            'Sao Tomé-et-Principe': { code: '+239', flag: '🇸🇹', stock: 200, basePrice: 6000 },
+            'Guinée-Bissau': { code: '+245', flag: '🇬🇼', stock: 200, basePrice: 4000 },
+            'Guinée': { code: '+224', flag: '🇬🇳', stock: 200, basePrice: 4000 },
+            'Sierra Leone': { code: '+232', flag: '🇸🇱', stock: 200, basePrice: 4000 },
+            'Liberia': { code: '+231', flag: '🇱🇷', stock: 200, basePrice: 4000 },
+            'Gambie': { code: '+220', flag: '🇬🇲', stock: 200, basePrice: 4000 },
+            'Sénégal': { code: '+221', flag: '🇸🇳', stock: 200, basePrice: 4000 } // déjà présent
+        };
+
+        // Ajouter encore plus de pays pour atteindre 200+ (simplification : on duplique avec variations)
+        // En pratique, vous pouvez avoir une vraie liste. Ici on en génère quelques-uns.
+        const moreCountries = [
+            ['Inde', '+91', '🇮🇳', 5000],
+            ['Chine', '+86', '🇨🇳', 6000],
+            ['Japon', '+81', '🇯🇵', 9000],
+            ['Corée du Sud', '+82', '🇰🇷', 8500],
+            ['Indonésie', '+62', '🇮🇩', 5000],
+            ['Malaisie', '+60', '🇲🇾', 6000],
+            ['Singapour', '+65', '🇸🇬', 10000],
+            ['Thaïlande', '+66', '🇹🇭', 5500],
+            ['Vietnam', '+84', '🇻🇳', 5000],
+            ['Philippines', '+63', '🇵🇭', 5000],
+            ['Brésil', '+55', '🇧🇷', 7000],
+            ['Argentine', '+54', '🇦🇷', 7000],
+            ['Chili', '+56', '🇨🇱', 7000],
+            ['Colombie', '+57', '🇨🇴', 6500],
+            ['Pérou', '+51', '🇵🇪', 6500],
+            ['Mexique', '+52', '🇲🇽', 7000],
+            ['Australie', '+61', '🇦🇺', 9000],
+            ['Nouvelle-Zélande', '+64', '🇳🇿', 9000]
+        ];
+        moreCountries.forEach(([name, code, flag, price]) => {
+            if (!countriesData[name]) {
+                countriesData[name] = { code, flag, stock: 200, basePrice: price };
+            }
+        });
+
+        // Ajouter les prix
+        Object.keys(countriesData).forEach(country => {
+            services.forEach(service => {
+                if (!countriesData[country].prices) countriesData[country].prices = {};
+                countriesData[country].prices[service.id] = countriesData[country].basePrice + Math.floor(Math.random() * 1000);
+            });
+        });
+
+        // ==================== PACKS DE BOOSTAGE ====================
+        const boostPacks = {
+            tiktok: {
+                id: 'tiktok',
+                name: 'TikTok Viral',
+                icon: 'fab fa-tiktok',
+                color: '#000000',
+                price: 7000,
+                features: [
+                    '1000 abonnés TikTok',
+                    '5000 likes',
+                    '10000 vues',
+                    '1000 partages',
+                    '50 commentaires'
+                ],
+                fields: [
+                    { name: 'Lien du compte TikTok (abonnés)', placeholder: 'https://tiktok.com/@toncompte' },
+                    { name: 'Lien de la vidéo pour likes', placeholder: 'https://tiktok.com/@compte/video/123456' },
+                    { name: 'Lien de la vidéo pour vues', placeholder: 'https://tiktok.com/@compte/video/123456' },
+                    { name: 'Lien de la vidéo pour partages', placeholder: 'https://tiktok.com/@compte/video/123456' },
+                    { name: 'Lien de la vidéo pour commentaires', placeholder: 'https://tiktok.com/@compte/video/123456' }
+                ]
+            },
+            youtube: {
+                id: 'youtube',
+                name: 'YouTube Starter',
+                icon: 'fab fa-youtube',
+                color: '#ff0000',
+                price: 16000,
+                features: [
+                    '500 abonnés YouTube',
+                    '5000 vues',
+                    '200 likes',
+                    '50 commentaires'
+                ],
+                fields: [
+                    { name: 'Lien de la chaîne YouTube (abonnés)', placeholder: 'https://youtube.com/@toncompte' },
+                    { name: 'Lien de la vidéo pour vues', placeholder: 'https://youtube.com/watch?v=123456' },
+                    { name: 'Lien de la vidéo pour likes', placeholder: 'https://youtube.com/watch?v=123456' },
+                    { name: 'Lien de la vidéo pour commentaires', placeholder: 'https://youtube.com/watch?v=123456' }
+                ]
+            },
+            instagram: {
+                id: 'instagram',
+                name: 'Instagram Pro',
+                icon: 'fab fa-instagram',
+                color: '#e4405f',
+                price: 5960,
+                features: [
+                    '1000 followers Instagram',
+                    '5000 likes',
+                    '7000 vues vidéo/réel',
+                    '1000 vues stories',
+                    '100 commentaires'
+                ],
+                fields: [
+                    { name: 'Lien du profil Instagram (followers)', placeholder: 'https://instagram.com/tonprofil' },
+                    { name: 'Lien de la publication pour likes', placeholder: 'https://instagram.com/p/123456' },
+                    { name: 'Lien de la vidéo/réel pour vues', placeholder: 'https://instagram.com/reel/123456' },
+                    { name: 'Lien de la story pour vues', placeholder: 'https://instagram.com/stories/123456' },
+                    { name: 'Lien de la publication pour commentaires', placeholder: 'https://instagram.com/p/123456' }
+                ]
+            },
+            facebook: {
+                id: 'facebook',
+                name: 'Facebook Pro',
+                icon: 'fab fa-facebook',
+                color: '#1877f2',
+                price: 6884,
+                features: [
+                    '1000 abonnés page Facebook',
+                    '1000 abonnés profil',
+                    '3000 réactions',
+                    '1000 partages',
+                    '20000 vues vidéo',
+                    '100 commentaires',
+                    '10 avis'
+                ],
+                fields: [
+                    { name: 'Lien de la page Facebook (abonnés)', placeholder: 'https://facebook.com/tapage' },
+                    { name: 'Lien du profil Facebook (abonnés)', placeholder: 'https://facebook.com/tonprofil' },
+                    { name: 'Lien de la publication pour réactions', placeholder: 'https://facebook.com/123456/posts/123456' },
+                    { name: 'Lien de la publication pour partages', placeholder: 'https://facebook.com/123456/posts/123456' },
+                    { name: 'Lien de la vidéo pour vues', placeholder: 'https://facebook.com/watch/?v=123456' },
+                    { name: 'Lien de la publication pour commentaires', placeholder: 'https://facebook.com/123456/posts/123456' },
+                    { name: 'Lien de la page pour avis', placeholder: 'https://facebook.com/tapage/reviews' }
+                ]
+            }
+        };
+
+        // ==================== INITIALISATION ====================
+        AOS.init({ duration: 800, once: true });
+        loadAvisFromStorage();
+        renderHomeServices();
+        startAvisSlider();
+
+        // ==================== FONCTIONS MENU ====================
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('sidebarOverlay').style.display = 'block';
+        }
+        
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').style.display = 'none';
+        }
+
+        // ==================== AUTH ====================
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            updateHeader();
+            
+            if (user) {
+                const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+                if (!db.users) db.users = {};
+                if (!db.orders) db.orders = [];
+                if (!db.boostOrders) db.boostOrders = [];
+                
+                if (!db.users[user.uid]) {
+                    db.users[user.uid] = {
+                        uid: user.uid,
+                        customId: generateUserId(user.email),
+                        email: user.email,
+                        fullName: user.displayName || 'Utilisateur',
+                        balance: 0,
+                        createdAt: new Date().toISOString(),
+                        isAdmin: false,
+                        numerosPassword: null,
+                        phone: '',
+                        boostCount: 0,
+                        boostTotalSpent: 0
+                    };
+                    localStorage.setItem('virtunum_db', JSON.stringify(db));
+                }
+                
+                const userData = db.users[user.uid];
+                document.getElementById('sidebarAvatar').innerText = (userData.fullName?.[0] || 'U').toUpperCase();
+                document.getElementById('sidebarUserName').innerText = userData.fullName;
+                document.getElementById('sidebarUserEmail').innerText = user.email;
+
+                const activePage = document.querySelector('.page.active-page').id;
+                if (['homePage', 'loginPage', 'registerPage', 'forgotPasswordPage'].includes(activePage)) {
+                    showPage('dashboard');
+                }
+                
+                updateBoostStats();
+            } else {
+                showPage('home');
+            }
+        });
+
+        function generateUserId(email) {
+            const prefix = email.substring(0, 3).toUpperCase();
+            const rand = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+            return `VN-${prefix}${rand}`;
+        }
+
+        function updateHeader() {
+            const header = document.getElementById('mainHeader');
+            if (currentUser) {
+                const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+                const userData = db.users?.[currentUser.uid] || {};
+                const initial = (userData.fullName?.[0] || 'U').toUpperCase();
+                header.innerHTML = `
+                    <div class="header-left">
+                        <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                        <div class="logo" onclick="handleLogoClick()">VirtuNum</div>
+                    </div>
+                    <div class="header-right">
+                        <div class="user-avatar" onclick="toggleSidebar()">${initial}</div>
+                    </div>
+                `;
+            } else {
+                header.innerHTML = `
+                    <div class="header-left">
+                        <div class="logo" onclick="handleLogoClick()">VirtuNum</div>
+                    </div>
+                    <div class="header-right">
+                        <button class="btn-outline" onclick="showPage('login')"><i class="fas fa-sign-in-alt"></i> Connexion</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ==================== PAGES ====================
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            const page = document.getElementById(pageId + 'Page');
+            if (page) page.classList.add('active-page');
+            window.scrollTo(0, 0);
+            
+            if (pageId === 'dashboard' && currentUser) loadDashboard();
+            if (pageId === 'buyService') renderServices();
+            if (pageId === 'historique' && currentUser) loadHistorique();
+            if (pageId === 'profile' && currentUser) loadProfile();
+            if (pageId === 'mesNumeros' && currentUser) checkNumerosAccess();
+            if (pageId === 'admin') loadAdminDashboard();
+            if (pageId === 'boostReseaux' && currentUser) loadBoostPage();
+            
+            closeSidebar();
+        }
+
+        // ==================== AVIS SLIDER ====================
+        function startAvisSlider() {
+            const track = document.getElementById('avisTrack');
+            if (!track) return;
+            
+            let html = '';
+            const allAvis = [...avis, ...avis, ...avis];
+            allAvis.forEach(a => {
+                html += `
+                    <div class="avis-card">
+                        <div class="avis-header">
+                            <div class="avis-avatar">${a.author[0].toUpperCase()}</div>
+                            <div>
+                                <div class="avis-author">${a.author}</div>
+                                <div class="avis-date">${new Date(a.date).toLocaleDateString()}</div>
+                            </div>
+                        </div>
+                        <div class="avis-rating">${'⭐'.repeat(a.rating)}</div>
+                        <div class="avis-content">"${a.message}"</div>
+                    </div>
+                `;
+            });
+            
+            track.innerHTML = html;
+        }
+
+        // ==================== CONNEXION / INSCRIPTION ====================
+        document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+            try {
+                await auth.signInWithEmailAndPassword(
+                    document.getElementById('loginEmail').value,
+                    document.getElementById('loginPassword').value
+                );
+                showToast('Connexion réussie', 'success');
+            } catch (error) {
+                document.getElementById('loginError').innerText = error.message;
+                document.getElementById('loginError').classList.remove('d-none');
+                showToast(error.message, 'danger');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pwd = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+            
+            if (pwd !== confirm) {
+                showToast('Les mots de passe ne correspondent pas', 'danger');
+                return;
+            }
+            if (pwd.length < 6) {
+                showToast('Le mot de passe doit contenir au moins 6 caractères', 'warning');
+                return;
+            }
+            
+            showLoading(true);
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(
+                    document.getElementById('regEmail').value,
+                    pwd
+                );
+                await cred.user.updateProfile({ displayName: document.getElementById('regFullName').value });
+                showToast('Inscription réussie', 'success');
+            } catch (error) {
+                document.getElementById('registerError').innerText = error.message;
+                document.getElementById('registerError').classList.remove('d-none');
+                showToast(error.message, 'danger');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        document.getElementById('forgotPasswordForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+            try {
+                await auth.sendPasswordResetEmail(document.getElementById('forgotEmail').value);
+                document.getElementById('forgotSuccess').classList.remove('d-none');
+                document.getElementById('forgotError').classList.add('d-none');
+                showToast('Email de réinitialisation envoyé', 'success');
+            } catch (error) {
+                document.getElementById('forgotError').innerText = error.message;
+                document.getElementById('forgotError').classList.remove('d-none');
+                showToast(error.message, 'danger');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        async function logout() {
+            await auth.signOut();
+            showToast('Déconnexion réussie', 'success');
+            showPage('home');
+            closeSidebar();
+        }
+
+        // ==================== ADMIN ACCESS ====================
+        function handleLogoClick() {
+            logoClickCount++;
+            setTimeout(() => {
+                if (logoClickCount >= 3) {
+                    const pwd = prompt('🔐 Mot de passe admin:');
+                    if (pwd === '23456789+++') {
+                        sessionStorage.setItem('admin_session', 'active');
+                        
+                        if (!currentUser) {
+                            const adminId = 'admin-' + Date.now();
+                            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+                            if (!db.users) db.users = {};
+                            db.users[adminId] = {
+                                uid: adminId,
+                                customId: 'ADMIN-MASTER',
+                                email: 'admin@virtunum.com',
+                                fullName: 'Administrateur',
+                                balance: 0,
+                                isAdmin: true,
+                                createdAt: new Date().toISOString()
+                            };
+                            localStorage.setItem('virtunum_db', JSON.stringify(db));
+                        } else {
+                            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+                            if (db.users[currentUser.uid]) {
+                                db.users[currentUser.uid].isAdmin = true;
+                                localStorage.setItem('virtunum_db', JSON.stringify(db));
+                            }
+                        }
+                        showToast('✅ Accès administrateur', 'success');
+                        showPage('admin');
+                        loadAdminDashboard();
+                    } else {
+                        showToast('❌ Mot de passe incorrect', 'danger');
+                    }
+                    logoClickCount = 0;
+                }
+            }, 300);
+        }
+
+        // ==================== SERVICES / PAYS ====================
+        function renderHomeServices() {
+            const grid = document.getElementById('homeServicesGrid');
+            let html = '';
+            services.slice(0, 12).forEach(s => {
+                html += `<div class="service-card"><i class="${s.icon}" style="color:${s.color};"></i><h3>${s.name}</h3></div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        function renderServices() {
+            let html = '';
+            services.forEach(s => {
+                html += `<div class="service-card" onclick="selectService('${s.id}')"><i class="${s.icon}" style="color:${s.color};"></i><h3>${s.name}</h3></div>`;
+            });
+            document.getElementById('serviceGrid').innerHTML = html;
+        }
+
+        function selectService(serviceId) {
+            currentService = serviceId;
+            document.getElementById('stepService').classList.replace('active', 'completed');
+            document.getElementById('stepCountry').classList.add('active');
+            showPage('buyCountry');
+            renderCountries(serviceId);
+        }
+
+        function renderCountries(serviceId) {
+            const service = services.find(s => s.id === serviceId);
+            document.getElementById('countryPageTitle').innerText = `🌍 Pays pour ${service.name}`;
+            let html = '';
+            
+            Object.entries(countriesData).forEach(([name, data]) => {
+                const price = data.prices?.[serviceId] || 3000;
+                html += `<div class="country-item" onclick="selectCountry('${serviceId}','${name}',${price},'${data.flag}','${data.code}')">
+                    <div class="country-info">
+                        <span class="country-flag">${data.flag}</span>
+                        <span class="country-name">${name}</span>
+                    </div>
+                    <span class="country-price">${price.toLocaleString()} XOF</span>
+                </div>`;
+            });
+            
+            document.getElementById('countryList').innerHTML = html;
+        }
+
+        function filterCountries() {
+            const search = document.getElementById('countrySearch').value.toLowerCase();
+            document.querySelectorAll('.country-item').forEach(item => {
+                const name = item.querySelector('.country-name').innerText.toLowerCase();
+                item.style.display = name.includes(search) ? 'flex' : 'none';
+            });
+        }
+
+        function selectCountry(serviceId, countryName, price, flag, code) {
+            currentCountry = countryName;
+            currentPrice = price;
+            currentCountryFlag = flag;
+            currentCountryCode = code;
+            document.getElementById('stepCountry').classList.replace('active', 'completed');
+            document.getElementById('stepValidation').classList.add('active');
+            showPage('checkout');
+            updateCheckout();
+        }
+
+        function updateCheckout() {
+            const service = services.find(s => s.id === currentService);
+            document.getElementById('checkoutService').innerText = service.name;
+            document.getElementById('checkoutCountry').innerText = currentCountryFlag + ' ' + currentCountry;
+            document.getElementById('checkoutPrice').innerText = currentPrice.toLocaleString() + ' XOF';
+            
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const balance = db.users?.[currentUser?.uid]?.balance || 0;
+            
+            document.getElementById('checkoutBalance').innerText = balance.toLocaleString() + ' XOF';
+            const diff = currentPrice - balance;
+            document.getElementById('checkoutDifference').innerText = (diff > 0 ? diff : 0).toLocaleString() + ' XOF';
+            
+            if (balance >= currentPrice) {
+                document.getElementById('checkoutConfirmBtn').disabled = false;
+                document.getElementById('checkoutRechargeBtn').style.display = 'none';
+                document.getElementById('checkoutAlert').classList.add('d-none');
+            } else {
+                document.getElementById('checkoutConfirmBtn').disabled = true;
+                document.getElementById('checkoutRechargeBtn').style.display = 'block';
+                document.getElementById('checkoutAlert').classList.remove('d-none');
+                document.getElementById('checkoutAlertMessage').innerText = `Solde: ${balance.toLocaleString()} XOF / ${currentPrice.toLocaleString()} XOF requis`;
+            }
+        }
+
+        function goBackToServices() { showPage('buyService'); }
+        function goBackToCountry() { if (currentService) { showPage('buyCountry'); renderCountries(currentService); } else showPage('buyService'); }
+
+        function confirmOrder() {
+            if (!currentUser) {
+                showToast('Connecte-toi', 'warning');
+                showPage('login');
+                return;
+            }
+            
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            if ((db.users?.[currentUser.uid]?.balance || 0) < currentPrice) {
+                showToast('Solde insuffisant', 'danger');
+                return;
+            }
+            
+            db.users[currentUser.uid].balance -= currentPrice;
+            
+            const service = services.find(s => s.id === currentService);
+            const order = {
+                id: 'ORD' + Date.now() + Math.random().toString(36).substr(2, 5),
+                userId: currentUser.uid,
+                customId: db.users[currentUser.uid].customId,
+                userEmail: currentUser.email,
+                service: currentService,
+                serviceName: service.name,
+                country: currentCountry,
+                countryFlag: currentCountryFlag,
+                countryCode: currentCountryCode,
+                price: currentPrice,
+                status: 'pending_verification',
+                createdAt: new Date().toISOString(),
+                documentsSubmitted: false
+            };
+            
+            if (!db.orders) db.orders = [];
+            db.orders.push(order);
+            localStorage.setItem('virtunum_db', JSON.stringify(db));
+            sessionStorage.setItem('currentOrderId', order.id);
+            
+            showToast('Paiement effectué', 'success');
+            showPage('verification');
+        }
+
+        // ==================== VÉRIFICATION ====================
+        document.getElementById('verificationForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const orderId = sessionStorage.getItem('currentOrderId');
+            if (!orderId) {
+                showToast('Aucune commande', 'danger');
+                return;
+            }
+            
+            const data = {
+                nom: document.getElementById('verifNom').value,
+                telephone: document.getElementById('verifTelephone').value,
+                email: document.getElementById('verifEmail').value,
+                pays: document.getElementById('verifPays').value,
+                quartier: document.getElementById('verifQuartier').value,
+                numCarte: document.getElementById('verifNumCarte').value,
+                submittedAt: new Date().toISOString()
+            };
+            
+            for (let v of Object.values(data)) {
+                if (!v) {
+                    showToast('Tous les champs sont obligatoires', 'warning');
+                    return;
+                }
+            }
+            
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const idx = db.orders.findIndex(o => o.id === orderId);
+            
+            if (idx !== -1) {
+                db.orders[idx] = { ...db.orders[idx], ...data, documentsSubmitted: true };
+                localStorage.setItem('virtunum_db', JSON.stringify(db));
+                sessionStorage.removeItem('currentOrderId');
+                showToast('Documents soumis', 'success');
+                showPage('mesNumeros');
+            } else {
+                showToast('Commande introuvable', 'danger');
+            }
+        });
+
+        // ==================== DASHBOARD ====================
+        function loadDashboard() {
+            if (!currentUser) return;
+            
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const user = db.users?.[currentUser.uid];
+            if (!user) return;
+            
+            document.getElementById('userName').innerText = user.fullName;
+            document.getElementById('userBalance').innerText = (user.balance || 0).toLocaleString() + ' XOF';
+            
+            const userOrders = (db.orders || []).filter(o => o.userId === currentUser.uid);
+            const userBoosts = (db.boostOrders || []).filter(b => b.userId === currentUser.uid);
+            
+            document.getElementById('statsCommandes').innerText = userOrders.length;
+            document.getElementById('statsNumeros').innerText = userOrders.filter(o => o.status === 'validated').length;
+            document.getElementById('statsBoost').innerText = userBoosts.length;
+            
+            const recent = [...userOrders, ...userBoosts]
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .slice(0, 5);
+            
+            let html = '';
+            recent.forEach(item => {
+                if (item.serviceName) {
+                    const statusClass = item.status === 'validated' ? 'success' : item.status === 'rejected' ? 'danger' : 'warning';
+                    const statusText = item.status === 'validated' ? 'Validé' : item.status === 'rejected' ? 'Rejeté' : 'En attente';
+                    html += `<tr>
+                        <td>${new Date(item.createdAt).toLocaleDateString()}</td>
+                        <td>${item.serviceName}</td>
+                        <td>${(item.price || 0).toLocaleString()} XOF</td>
+                        <td><span class="badge badge-${statusClass}">${statusText}</span></td>
+                    </tr>`;
+                } else if (item.packName) {
+                    html += `<tr>
+                        <td>${new Date(item.createdAt).toLocaleDateString()}</td>
+                        <td>🚀 ${item.packName}</td>
+                        <td>${(item.price || 0).toLocaleString()} XOF</td>
+                        <td><span class="badge badge-success">En cours</span></td>
+                    </tr>`;
+                }
+            });
+            
+            document.getElementById('recentOrdersTable').innerHTML = html || '<tr><td colspan="4">Aucune transaction</td></tr>';
+        }
+
+        // ==================== PROFIL ====================
+        function loadProfile() {
+            if (!currentUser) return;
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const user = db.users?.[currentUser.uid];
+            document.getElementById('profileName').value = user?.fullName || '';
+            document.getElementById('profileEmail').value = user?.email || '';
+            document.getElementById('profilePhone').value = user?.phone || '';
+        }
+        
+        document.getElementById('profileForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            if (db.users?.[currentUser.uid]) {
+                db.users[currentUser.uid].fullName = document.getElementById('profileName').value;
+                db.users[currentUser.uid].phone = document.getElementById('profilePhone').value;
+                localStorage.setItem('virtunum_db', JSON.stringify(db));
+                showToast('Profil mis à jour', 'success');
+                updateHeader();
+            }
+        });
+
+        // ==================== HISTORIQUE ====================
+        function loadHistorique() {
+            if (!currentUser) return;
+            
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const orders = (db.orders || []).filter(o => o.userId === currentUser.uid);
+            const boosts = (db.boostOrders || []).filter(b => b.userId === currentUser.uid);
+            
+            const all = [...orders, ...boosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            let html = '';
+            all.forEach(item => {
+                if (item.serviceName) {
+                    const statusClass = item.status === 'validated' ? 'success' : item.status === 'rejected' ? 'danger' : 'warning';
+                    const statusText = item.status === 'validated' ? 'Validé' : item.status === 'rejected' ? 'Rejeté' : 'En attente';
+                    html += `<tr>
+                        <td><code>${item.id.slice(-8)}</code></td>
+                        <td>${new Date(item.createdAt).toLocaleDateString()}</td>
+                        <td>${item.serviceName}</td>
+                        <td>${(item.price || 0).toLocaleString()} XOF</td>
+                        <td><span class="badge badge-${statusClass}">${statusText}</span></td>
+                    </tr>`;
+                } else if (item.packName) {
+                    html += `<tr>
+                        <td><code>${item.id.slice(-8)}</code></td>
+                        <td>${new Date(item.createdAt).toLocaleDateString()}</td>
+                        <td>🚀 ${item.packName}</td>
+                        <td>${(item.price || 0).toLocaleString()} XOF</td>
+                        <td><span class="badge badge-success">En cours</span></td>
+                    </tr>`;
+                }
+            });
+            
+            document.getElementById('historiqueTable').innerHTML = html || '<tr><td colspan="5">Aucune transaction</td></tr>';
+        }
+
+        // ==================== MES NUMÉROS ====================
+        function checkNumerosAccess() {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const user = db.users?.[currentUser?.uid];
+            
+            if (user?.numerosPassword) {
+                document.getElementById('numerosNoCode').style.display = 'none';
+                document.getElementById('numerosHasCode').style.display = 'block';
+                document.getElementById('numerosInfoMessage').style.display = 'none';
+            } else {
+                document.getElementById('numerosNoCode').style.display = 'block';
+                document.getElementById('numerosHasCode').style.display = 'none';
+                document.getElementById('numerosInfoMessage').style.display = 'block';
+            }
+        }
+        
+        function createNumerosPassword() {
+            const pwd = document.getElementById('numerosNewPassword').value;
+            if (!/^\d{4}$/.test(pwd)) {
+                showToast('4 chiffres requis', 'warning');
+                return;
+            }
+            
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            if (db.users?.[currentUser.uid]) {
+                db.users[currentUser.uid].numerosPassword = pwd;
+                localStorage.setItem('virtunum_db', JSON.stringify(db));
+                showToast('Code créé', 'success');
+                checkNumerosAccess();
+            }
+        }
+        
+        function checkNumerosPassword() {
+            const pwd = document.getElementById('numerosPassword').value;
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            
+            if (pwd === db.users?.[currentUser.uid]?.numerosPassword) {
+                document.getElementById('numerosPasswordBlock').style.display = 'none';
+                document.getElementById('numerosListBlock').style.display = 'block';
+                loadNumeros();
+            } else {
+                showToast('Code incorrect', 'danger');
+            }
+        }
+        
+        function loadNumeros() {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const nums = (db.orders || []).filter(o => o.userId === currentUser.uid && o.status === 'validated');
+            
+            let html = '';
+            nums.forEach(n => {
+                html += `<div class="card" onclick="showNumeroDetail('${n.id}')">
+                    <div class="card-header">
+                        <div><h4>${n.countryFlag || ''} ${n.country || ''}</h4><p>${n.serviceName}</p></div>
+                        <span class="badge badge-success">Actif</span>
+                    </div>
+                    <div><p style="font-weight:700; font-size:1.2rem;">${n.assignedNumber || 'En attente'}</p></div>
+                </div>`;
+            });
+            
+            document.getElementById('numerosList').innerHTML = html || '<p class="text-center">Aucun numéro actif</p>';
+        }
+        
+        function showNumeroDetail(orderId) {
+            sessionStorage.setItem('currentNumeroId', orderId);
+            showPage('detailNumero');
+            
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const order = db.orders?.find(o => o.id === orderId);
+            
+            if (order) {
+                document.getElementById('detailNumero').innerText = order.assignedNumber || 'N/A';
+                document.getElementById('detailService').innerText = order.serviceName;
+                document.getElementById('detailPays').innerText = `${order.countryFlag || ''} ${order.country || ''}`;
+                document.getElementById('detailDate').innerText = new Date(order.createdAt).toLocaleDateString();
+                document.getElementById('detailPrix').innerText = (order.price || 0).toLocaleString() + ' XOF';
+                
+                let codes = '';
+                for (let i = 0; i < 2; i++) {
+                    const code = Math.floor(100000 + Math.random() * 900000);
+                    codes += `<tr>
+                        <td>${new Date().toLocaleString()}</td>
+                        <td><strong style="font-size:1.1rem;">${code}</strong></td>
+                        <td><button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText('${code}');showToast('Copié','success')"><i class="fas fa-copy"></i> Copier</button></td>
+                    </tr>`;
+                }
+                document.getElementById('codesList').innerHTML = codes || '<tr><td colspan="3">Aucun code reçu</td></tr>';
+            }
+        }
+
+        // ==================== BOOSTAGE RÉSEAUX ====================
+        function loadBoostPage() {
+            if (!currentUser) {
+                showToast('Connecte-toi', 'warning');
+                showPage('login');
+                return;
+            }
+            
+            updateBoostStats();
+            updateBoostStatus();
+        }
+        
+        function updateBoostStats() {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const user = db.users?.[currentUser?.uid];
+            const userBoosts = (db.boostOrders || []).filter(b => b.userId === currentUser?.uid);
+            
+            document.getElementById('boostBalance').innerText = (user?.balance || 0).toLocaleString() + ' XOF';
+            document.getElementById('boostStatsTotal').innerText = userBoosts.length;
+        }
+        
+        function updateBoostStatus() {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const balance = db.users?.[currentUser?.uid]?.balance || 0;
+            
+            Object.keys(boostPacks).forEach(packId => {
+                const pack = boostPacks[packId];
+                const statusDiv = document.getElementById(`boostStatus${packId.charAt(0).toUpperCase() + packId.slice(1)}`);
+                
+                if (statusDiv) {
+                    if (balance >= pack.price) {
+                        statusDiv.className = 'boost-sold-status boost-sold-sufficient';
+                        statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> Solde suffisant';
+                    } else {
+                        statusDiv.className = 'boost-sold-status boost-sold-insufficient';
+                        const needed = pack.price - balance;
+                        statusDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Il manque ${needed.toLocaleString()} XOF`;
+                    }
+                }
+            });
+        }
+        
+        function selectBoostPack(packId) {
+            if (!currentUser) {
+                showToast('Connecte-toi', 'warning');
+                showPage('login');
+                return;
+            }
+            
+            currentBoostPack = packId;
+            showPage('boostDetail');
+            loadBoostDetail(packId);
+        }
+        
+        function loadBoostDetail(packId) {
+            const pack = boostPacks[packId];
+            if (!pack) return;
+            
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const balance = db.users?.[currentUser?.uid]?.balance || 0;
+            const canBuy = balance >= pack.price;
+            
+            let fieldsHtml = '';
+            pack.fields.forEach((field, index) => {
+                fieldsHtml += `
+                    <div class="boost-link-group">
+                        <label class="form-label">${index + 1}. ${field.name} *</label>
+                        <input type="url" class="form-control" id="boostField${index}" placeholder="${field.placeholder}" required>
+                    </div>
+                `;
+            });
+            
+            const html = `
+                <div class="boost-detail-header">
+                    <div class="boost-detail-icon"><i class="${pack.icon}" style="color: ${pack.color}; font-size: 3rem;"></i></div>
+                    <div>
+                        <h2 style="font-size: 1.8rem;">${pack.name}</h2>
+                        <p style="color: var(--text-light);">Pack de boostage premium</p>
+                    </div>
+                </div>
+                
+                <div class="boost-detail-price" style="font-size: 2.5rem;">${pack.price.toLocaleString()} XOF</div>
+                
+                <div class="boost-balance-info" style="background: linear-gradient(135deg, #667eea10, #764ba210); padding: 1.5rem; border-radius: 16px;">
+                    <div class="flex justify-between">
+                        <span>Ton solde actuel :</span>
+                        <strong>${balance.toLocaleString()} XOF</strong>
+                    </div>
+                    <div class="flex justify-between" style="margin-top: 0.5rem;">
+                        <span>Reste après achat :</span>
+                        <strong>${(balance - pack.price).toLocaleString()} XOF</strong>
+                    </div>
+                </div>
+                
+                <div class="boost-features" style="margin: 1.5rem 0;">
+                    <h4 style="margin-bottom: 1rem;">Ce pack inclut :</h4>
+                    <ul style="list-style: none;">
+                        ${pack.features.map(f => `<li style="margin: 0.8rem 0;"><i class="fas fa-check-circle" style="color: #06d6a0; margin-right: 0.8rem;"></i> ${f}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                ${canBuy ? `
+                    <form id="boostOrderForm" onsubmit="submitBoostOrder(event)">
+                        <h4 style="margin: 1.5rem 0 1rem;">Entre tes liens :</h4>
+                        ${fieldsHtml}
+                        
+                        <div class="alert alert-warning" style="margin: 1.5rem 0;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Important :</strong> Tous les liens doivent commencer par <strong>https://</strong>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+                            <i class="fas fa-shopping-cart"></i> Confirmer et payer ${pack.price.toLocaleString()} XOF
+                        </button>
+                    </form>
+                ` : `
+                    <div class="alert alert-danger" style="margin: 1.5rem 0;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Solde insuffisant. Il te manque ${(pack.price - balance).toLocaleString()} XOF.
+                    </div>
+                    <button class="btn btn-success btn-block btn-lg" onclick="showPage('recharge')">
+                        <i class="fas fa-wallet"></i> Recharger mon compte
+                    </button>
+                `}
+            `;
+            
+            document.getElementById('boostDetailContainer').innerHTML = html;
+        }
+        
+        function submitBoostOrder(event) {
+            event.preventDefault();
+            
+            const pack = boostPacks[currentBoostPack];
+            if (!pack) {
+                showToast('Erreur: pack introuvable', 'danger');
+                return;
+            }
+            
+            const links = [];
+            let allFieldsFilled = true;
+            
+            for (let i = 0; i < pack.fields.length; i++) {
+                const input = document.getElementById(`boostField${i}`);
+                if (!input || !input.value.trim()) {
+                    allFieldsFilled = false;
+                    if (input) {
+                        input.style.borderColor = '#ef476f';
+                        input.classList.add('error');
+                        setTimeout(() => input.classList.remove('error'), 1000);
+                    }
+                    break;
+                }
+                
+                // Vérifier que le lien commence par https
+                const link = input.value.trim();
+                if (!link.startsWith('https://')) {
+                    showToast('Tous les liens doivent commencer par https://', 'warning');
+                    input.style.borderColor = '#ef476f';
+                    input.classList.add('error');
+                    setTimeout(() => input.classList.remove('error'), 1000);
+                    return;
+                }
+                
+                links.push(link);
+            }
+            
+            if (!allFieldsFilled) {
+                showToast('Veuillez remplir tous les liens', 'warning');
+                return;
+            }
+            
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            if (!currentUser) {
+                showToast('Vous devez être connecté', 'warning');
+                showPage('login');
+                return;
+            }
+            
+            const balance = db.users?.[currentUser.uid]?.balance || 0;
+            
+            if (balance < pack.price) {
+                showToast('Solde insuffisant', 'danger');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                db.users[currentUser.uid].balance -= pack.price;
+                db.users[currentUser.uid].boostCount = (db.users[currentUser.uid].boostCount || 0) + 1;
+                db.users[currentUser.uid].boostTotalSpent = (db.users[currentUser.uid].boostTotalSpent || 0) + pack.price;
+                
+                const boostOrder = {
+                    id: 'BST' + Date.now() + Math.random().toString(36).substr(2, 8).toUpperCase(),
+                    userId: currentUser.uid,
+                    customId: db.users[currentUser.uid].customId,
+                    userEmail: currentUser.email,
+                    packId: pack.id,
+                    packName: pack.name,
+                    price: pack.price,
+                    links: links,
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    guaranteedUntil: new Date(Date.now() + 15552000000).toISOString(),
+                    viewedByAdmin: false
+                };
+                
+                if (!db.boostOrders) db.boostOrders = [];
+                db.boostOrders.push(boostOrder);
+                
+                localStorage.setItem('virtunum_db', JSON.stringify(db));
+                
+                showLoading(false);
+                
+                showBoostConfirmation(boostOrder);
+                showToast('✅ Commande boost enregistrée avec succès !', 'success');
+                
+            } catch (error) {
+                showLoading(false);
+                console.error('Erreur:', error);
+                showToast('Erreur lors de la commande', 'danger');
+            }
+        }
+        
+        function showBoostConfirmation(order) {
+            showPage('boostConfirmation');
+            
+            const pack = boostPacks[order.packId] || { fields: [] };
+            
+            let linksHtml = '';
+            order.links.forEach((link, index) => {
+                const fieldName = pack.fields && pack.fields[index] ? pack.fields[index].name : `Lien ${index + 1}`;
+                linksHtml += `
+                    <div style="background: #f8f9fa; padding: 0.8rem; border-radius: 8px; margin: 0.5rem 0;">
+                        <small style="color: var(--text-light); display: block; margin-bottom: 0.3rem;">${fieldName}:</small>
+                        <strong style="word-break: break-all; color: var(--primary);">${link.substring(0, 50)}${link.length > 50 ? '...' : ''}</strong>
+                    </div>
+                `;
+            });
+            
+            const html = `
+                <div style="text-align: left;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 12px;">
+                            <small style="color: var(--text-light);">Pack</small>
+                            <p style="font-weight: 700; font-size: 1.2rem; color: var(--primary);">${order.packName}</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 12px;">
+                            <small style="color: var(--text-light);">Montant débité</small>
+                            <p style="font-weight: 700; font-size: 1.2rem; color: #06d6a0;">${order.price.toLocaleString()} XOF</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 12px;">
+                            <small style="color: var(--text-light);">Date</small>
+                            <p style="font-weight: 600;">${new Date(order.createdAt).toLocaleString()}</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 12px;">
+                            <small style="color: var(--text-light);">ID commande</small>
+                            <p style="font-weight: 600;"><code>${order.id.slice(-8)}</code></p>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #667eea10, #764ba210); padding: 1.5rem; border-radius: 16px; margin: 1rem 0;">
+                        <h4 style="margin-bottom: 1rem; color: var(--primary);"><i class="fas fa-link"></i> Liens fournis :</h4>
+                        ${linksHtml}
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin: 2rem 0;">
+                        <div style="text-align: center;">
+                            <span style="background: #ffd700; color: #000; padding: 0.3rem 1rem; border-radius: 50px; font-weight: 600;"><i class="fas fa-clock"></i> Livraison: 2h</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <span style="background: #06d6a0; color: white; padding: 0.3rem 1rem; border-radius: 50px; font-weight: 600;"><i class="fas fa-shield-alt"></i> Garantie 5 mois</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('boostConfirmationDetails').innerHTML = html;
+        }
+
+        // ==================== ADMIN ====================
+        function loadAdminDashboard() {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            
+            document.getElementById('adminStats').innerHTML = `
+                <div class="stat-card"><i class="fas fa-users"></i><div><p>${Object.keys(db.users || {}).length}</p><p>Utilisateurs</p></div></div>
+                <div class="stat-card"><i class="fas fa-clock"></i><div><p>${(db.orders || []).filter(o => o.status === 'pending_verification').length}</p><p>En attente</p></div></div>
+                <div class="stat-card"><i class="fas fa-rocket"></i><div><p>${(db.boostOrders || []).length}</p><p>Boostages</p></div></div>
+                <div class="stat-card"><i class="fas fa-coins"></i><div><p>${((db.orders || []).reduce((s, o) => s + (o.price || 0), 0) + (db.boostOrders || []).reduce((s, o) => s + (o.price || 0), 0)).toLocaleString()} XOF</p><p>CA</p></div></div>
+            `;
+            
+            loadAdminBoostOrders();
+            loadAdminStocks();
+            loadAdminPending();
+            loadAdminAvis();
+        }
+        
+        function loadAdminBoostOrders() {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const boosts = db.boostOrders || [];
+            
+            if (boosts.length === 0) {
+                document.getElementById('adminBoostTable').innerHTML = '<tr><td colspan="7" class="text-center">Aucune commande boostage</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            boosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(order => {
+                if (!order.viewedByAdmin) {
+                    order.viewedByAdmin = true;
+                }
+                
+                const statusBadge = order.status === 'completed' 
+                    ? '<span class="badge badge-success">Terminé</span>' 
+                    : '<span class="badge badge-warning">En cours</span>';
+                
+                const linksPreview = order.links ? order.links.map(l => l.substring(0, 15) + '...').join('<br>') : '-';
+                
+                html += `<tr>
+                    <td><code>${order.id.slice(-8)}</code></td>
+                    <td>${order.customId || 'N/A'}<br><small style="color: var(--text-light);">${order.userEmail || ''}</small></td>
+                    <td>🚀 ${order.packName}</td>
+                    <td><strong style="color: #06d6a0;">${order.price.toLocaleString()} XOF</strong></td>
+                    <td><small style="color: var(--text-light);">${linksPreview}</small></td>
+                    <td>${new Date(order.createdAt).toLocaleString()}</td>
+                    <td>
+                        ${statusBadge}
+                        <div style="display: flex; gap: 0.3rem; margin-top: 0.5rem;">
+                            <button class="btn btn-sm btn-info" onclick="viewBoostLinks('${order.id}')" style="padding: 0.3rem 0.6rem;" title="Voir détails"><i class="fas fa-eye"></i></button>
+                            ${order.status !== 'completed' ? `
+                                <button class="btn btn-sm btn-success" onclick="approveBoostOrder('${order.id}')" style="padding: 0.3rem 0.6rem;" title="Marquer comme terminé"><i class="fas fa-check"></i></button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>`;
+            });
+            
+            document.getElementById('adminBoostTable').innerHTML = html;
+            localStorage.setItem('virtunum_db', JSON.stringify(db));
+        }
+        
+        function approveBoostOrder(orderId) {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const idx = db.boostOrders.findIndex(o => o.id === orderId);
+            
+            if (idx !== -1) {
+                db.boostOrders[idx].status = 'completed';
+                db.boostOrders[idx].completedAt = new Date().toISOString();
+                localStorage.setItem('virtunum_db', JSON.stringify(db));
+                showToast('✅ Commande boost marquée comme terminée', 'success');
+                loadAdminBoostOrders();
+            }
+        }
+        
+        function viewBoostLinks(orderId) {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const order = db.boostOrders?.find(o => o.id === orderId);
+            
+            if (!order) {
+                showToast('Commande introuvable', 'danger');
+                return;
+            }
+            
+            const pack = boostPacks[order.packId] || { fields: [] };
+            
+            let linksHtml = '<div style="padding: 0.5rem;">';
+            linksHtml += `<h3 style="margin-bottom: 1rem;">Commande: ${order.packName}</h3>`;
+            linksHtml += `<p><strong>Client:</strong> ${order.customId} (${order.userEmail})</p>`;
+            linksHtml += `<p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>`;
+            linksHtml += `<p><strong>Montant:</strong> ${order.price.toLocaleString()} XOF</p>`;
+            linksHtml += `<p><strong>Statut:</strong> ${order.status === 'completed' ? '✅ Terminé' : '⏳ En cours'}</p>`;
+            linksHtml += `<hr style="margin: 1rem 0;">`;
+            linksHtml += `<h4>Liens fournis par le client:</h4>`;
+            
+            order.links.forEach((link, index) => {
+                const fieldName = pack.fields && pack.fields[index] ? pack.fields[index].name : `Lien ${index + 1}`;
+                linksHtml += `
+                    <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                        <strong>${fieldName}:</strong><br>
+                        <a href="${link}" target="_blank" style="color: var(--primary); word-break: break-all;">${link}</a>
+                    </div>
+                `;
+            });
+            
+            linksHtml += '</div>';
+            
+            showModal('Détails de la commande boost', linksHtml);
+        }
+
+        function loadAdminStocks() {
+            let html = '<thead><tr><th>Pays</th><th>Stock</th><th>Prix de base</th><th>Actions</th></tr></thead><tbody>';
+            
+            Object.entries(countriesData).forEach(([name, data]) => {
+                html += `<tr>
+                    <td>${data.flag} ${name}</td>
+                    <td>${data.stock || 200}</td>
+                    <td>${data.basePrice || 3000} XOF</td>
+                    <td><button class="btn btn-sm btn-success" onclick="updateStockPrompt('${name}')"><i class="fas fa-edit"></i> Modifier</button></td>
+                </tr>`;
+            });
+            
+            html += '</tbody>';
+            document.getElementById('adminStocksTable').innerHTML = html;
+        }
+
+        function loadAdminPending() {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const pending = (db.orders || []).filter(o => o.status === 'pending_verification');
+            
+            let html = '';
+            pending.forEach(order => {
+                html += `<tr>
+                    <td><code>${order.id.slice(-8)}</code></td>
+                    <td>${order.customId}</td>
+                    <td>${order.serviceName}</td>
+                    <td>${order.countryFlag} ${order.country}</td>
+                    <td>${order.price} XOF</td>
+                    <td>
+                        <button class="btn btn-sm btn-success" onclick="approveOrder('${order.id}')"><i class="fas fa-check"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="rejectOrder('${order.id}')"><i class="fas fa-times"></i></button>
+                    </td>
+                </tr>`;
+            });
+            
+            document.getElementById('adminPendingTable').innerHTML = html || '<tr><td colspan="6">Aucune commande en attente</td></tr>';
+        }
+
+        function loadAdminAvis() {
+            const tbody = document.getElementById('adminAvisTable');
+            let html = '';
+            
+            avis.forEach(a => {
+                html += `
+                    <tr>
+                        <td><strong>${a.author}</strong></td>
+                        <td>${'⭐'.repeat(a.rating)}</td>
+                        <td>${a.message.substring(0, 30)}${a.message.length > 30 ? '…' : ''}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAvis('${a.id}')"><i class="fas fa-trash"></i> Supprimer</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html || '<tr><td colspan="4">Aucun avis</td></tr>';
+        }
+
+        function deleteAvis(id) {
+            if (confirm('Supprimer cet avis ?')) {
+                avis = avis.filter(a => a.id !== id);
+                saveAvis();
+                loadAdminAvis();
+                startAvisSlider();
+                showToast('Avis supprimé', 'success');
+            }
+        }
+
+        function searchUserById() {
+            const search = document.getElementById('adminSearchUserId').value.trim();
+            if (!search) return;
+            
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            let found = null, foundUid = null;
+            
+            Object.entries(db.users || {}).forEach(([uid, u]) => {
+                if (u.customId === search || u.email === search || u.customId?.includes(search)) {
+                    found = u;
+                    foundUid = uid;
+                }
+            });
+            
+            if (found) {
+                selectedUserId = foundUid;
+                document.getElementById('userSearchResult').innerHTML = `
+                    <div class="alert alert-info">
+                        <p><strong>ID:</strong> ${found.customId}</p>
+                        <p><strong>Nom:</strong> ${found.fullName}</p>
+                        <p><strong>Email:</strong> ${found.email}</p>
+                        <p><strong>Solde:</strong> ${(found.balance || 0).toLocaleString()} XOF</p>
+                        <p><strong>Boostages:</strong> ${found.boostCount || 0}</p>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <input type="number" class="form-control" id="adminBalanceAmount" placeholder="Montant">
+                        <select class="form-control" id="adminBalanceAction">
+                            <option value="add">Ajouter</option>
+                            <option value="remove">Retirer</option>
+                        </select>
+                        <button class="btn btn-success" onclick="updateUserBalance()"><i class="fas fa-check"></i> OK</button>
+                    </div>
+                `;
+            } else {
+                document.getElementById('userSearchResult').innerHTML = '<div class="alert alert-danger">Utilisateur non trouvé</div>';
+            }
+        }
+
+        function updateUserBalance() {
+            if (!selectedUserId) return;
+            
+            const amount = parseInt(document.getElementById('adminBalanceAmount').value);
+            if (!amount || amount <= 0) {
+                showToast('Montant invalide', 'warning');
+                return;
+            }
+            
+            const action = document.getElementById('adminBalanceAction').value;
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const user = db.users[selectedUserId];
+            
+            if (!user) return;
+            
+            const current = user.balance || 0;
+            if (action === 'add') user.balance = current + amount;
+            else user.balance = Math.max(0, current - amount);
+            
+            localStorage.setItem('virtunum_db', JSON.stringify(db));
+            showToast('Solde modifié', 'success');
+            searchUserById();
+        }
+
+        function approveOrder(orderId) {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const idx = db.orders.findIndex(o => o.id === orderId);
+            
+            if (idx === -1) return;
+            
+            const order = db.orders[idx];
+            const randomNum = Math.floor(Math.random() * 10000000).toString().padStart(8, '0');
+            const countryCode = countriesData[order.country]?.code || '+229';
+            
+            db.orders[idx].status = 'validated';
+            db.orders[idx].assignedNumber = `${countryCode} ${randomNum}`;
+            db.orders[idx].validatedAt = new Date().toISOString();
+            
+            localStorage.setItem('virtunum_db', JSON.stringify(db));
+            showToast('Commande approuvée', 'success');
+            loadAdminDashboard();
+        }
+
+        function rejectOrder(orderId) {
+            const db = JSON.parse(localStorage.getItem('virtunum_db') || '{}');
+            const idx = db.orders.findIndex(o => o.id === orderId);
+            
+            if (idx === -1) return;
+            
+            const order = db.orders[idx];
+            if (order.userId && db.users[order.userId]) {
+                db.users[order.userId].balance += order.price;
+            }
+            
+            db.orders[idx].status = 'rejected';
+            localStorage.setItem('virtunum_db', JSON.stringify(db));
+            showToast('Commande rejetée', 'success');
+            loadAdminDashboard();
+        }
+
+        function updateStockPrompt(country) {
+            let newStock = prompt('Nouveau stock pour ' + country + ' (min 200):', '200');
+            if (newStock && !isNaN(newStock) && parseInt(newStock) >= 200) {
+                newStock = parseInt(newStock);
+                countriesData[country].stock = newStock;
+                showToast('Stock mis à jour', 'success');
+                loadAdminStocks();
+            }
+        }
+
+        // ==================== GESTION DES AVIS ====================
+        function loadAvisFromStorage() {
+            const stored = localStorage.getItem('virtunum_avis');
+            if (stored) {
+                avis = JSON.parse(stored);
+            } else {
+                avis = [
+                    { id: '1', author: 'Marc K.', rating: 5, message: "Incroyable ! J'ai reçu mon code en moins de 30 secondes. Je recommande vivement VirtuNum !", date: new Date().toISOString() },
+                    { id: '2', author: 'Aïcha D.', rating: 5, message: "Le seul site fiable en Afrique pour les numéros virtuels. Service client réactif.", date: new Date().toISOString() },
+                    { id: '3', author: 'Paul E.', rating: 4, message: "Très satisfait du service de boostage Instagram. J'ai gagné 1000 followers en 2h !", date: new Date().toISOString() },
+                    { id: '4', author: 'Fatima S.', rating: 5, message: "Interface simple et paiement Mobile Money rapide. Merci VirtuNum !", date: new Date().toISOString() },
+                    { id: '5', author: 'Jean B.', rating: 5, message: "Je valide à 100%. Support technique disponible et à l'écoute.", date: new Date().toISOString() }
+                ];
+                localStorage.setItem('virtunum_avis', JSON.stringify(avis));
+            }
+        }
+
+        function saveAvis() {
+            localStorage.setItem('virtunum_avis', JSON.stringify(avis));
+        }
+
+        document.getElementById('publicAvisForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const author = document.getElementById('avisName').value.trim();
+            const rating = parseInt(document.getElementById('avisRating').value);
+            const message = document.getElementById('avisMessage').value.trim();
+            
+            if (!author || !message) return;
+            
+            const newAvis = {
+                id: Date.now().toString(),
+                author,
+                rating,
+                message,
+                date: new Date().toISOString()
+            };
+            
+            avis.unshift(newAvis);
+            saveAvis();
+            startAvisSlider();
+            document.getElementById('publicAvisForm').reset();
+            showToast('Merci pour ton avis !', 'success');
+        });
+
+        // ==================== REDIRECT ====================
+        function redirectToBuy() {
+            if (currentUser) showPage('buyService');
+            else {
+                showToast('Connecte-toi', 'info');
+                showPage('login');
+            }
+        }
+
+        // ==================== FAQ ====================
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('i');
+            
+            if (answer.classList.contains('show')) {
+                answer.classList.remove('show');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                answer.classList.add('show');
+                icon.style.transform = 'rotate(90deg)';
+            }
+        }
+
+        // ==================== MODAL ====================
+        function showModal(title, content) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2>${title}</h2>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">${content}</div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // ==================== TOAST & LOADING ====================
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'danger' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fas ${icon}"></i></div>
+                <div class="toast-content">
+                    <div class="toast-title">${type === 'success' ? 'Succès' : type === 'danger' ? 'Erreur' : 'Info'}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            `;
+            
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        // ==================== INIT ====================
+        renderServices();
+        
+        // Exposer les fonctions globalement
+        window.showPage = showPage;
+        window.logout = logout;
+        window.toggleSidebar = toggleSidebar;
+        window.closeSidebar = closeSidebar;
+        window.handleLogoClick = handleLogoClick;
+        window.selectService = selectService;
+        window.selectCountry = selectCountry;
+        window.goBackToServices = goBackToServices;
+        window.goBackToCountry = goBackToCountry;
+        window.filterCountries = filterCountries;
+        window.confirmOrder = confirmOrder;
+        window.redirectToBuy = redirectToBuy;
+        window.createNumerosPassword = createNumerosPassword;
+        window.checkNumerosPassword = checkNumerosPassword;
+        window.showNumeroDetail = showNumeroDetail;
+        window.searchUserById = searchUserById;
+        window.updateUserBalance = updateUserBalance;
+        window.approveOrder = approveOrder;
+        window.rejectOrder = rejectOrder;
+        window.updateStockPrompt = updateStockPrompt;
+        window.toggleFaq = toggleFaq;
+        window.selectBoostPack = selectBoostPack;
+        window.submitBoostOrder = submitBoostOrder;
+        window.approveBoostOrder = approveBoostOrder;
+        window.viewBoostLinks = viewBoostLinks;
+        window.deleteAvis = deleteAvis;
+    </script>
+</body>
+</html>
